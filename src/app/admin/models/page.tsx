@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Plus, Trash2, Edit2, Check, X, ShieldCheck, Cpu } from "lucide-react";
+import { Plus, Trash2, Edit2, Check, X, ShieldCheck, Cpu, FileSpreadsheet } from "lucide-react";
+import { ImportModelsModal } from "@/components/ImportModelsModal";
 
 interface Model {
   id: number;
@@ -28,6 +29,7 @@ export default function ManageModelsPage() {
   const [soBanChup, setSoBanChup] = useState("100000");
   const [soThang, setSoThang] = useState("12");
   const [saving, setSaving] = useState(false);
+  const [showImport, setShowImport] = useState(false);
 
   const fetchModels = () => {
     setLoading(true);
@@ -267,8 +269,15 @@ export default function ManageModelsPage() {
       {/* Right side: List Table */}
       <div className="lg:col-span-2 flex flex-col">
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex-1 flex flex-col">
-          <div className="p-4 border-b border-slate-100 bg-slate-50 font-bold text-slate-700">
-            Danh sách Model máy hiện có ({models.length})
+          <div className="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between gap-3">
+            <span className="font-bold text-slate-700">Danh sách Model máy hiện có ({models.length})</span>
+            <button
+              onClick={() => setShowImport(true)}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+            >
+              <FileSpreadsheet className="h-4 w-4" />
+              Nhập từ Excel
+            </button>
           </div>
 
           <div className="overflow-x-auto flex-1">
@@ -326,6 +335,13 @@ export default function ManageModelsPage() {
           </div>
         </div>
       </div>
+
+      {showImport && (
+        <ImportModelsModal
+          onClose={() => setShowImport(false)}
+          onImported={fetchModels}
+        />
+      )}
     </div>
   );
 }

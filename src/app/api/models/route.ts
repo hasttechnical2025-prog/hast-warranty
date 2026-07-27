@@ -55,9 +55,24 @@ export async function POST(request: NextRequest) {
         .select()
         .single();
 
-      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      if (error) {
+        if (error.code === '23505') {
+          return NextResponse.json({ error: `Đã có model tên "${payload.model_name}".` }, { status: 409 });
+        }
+        return NextResponse.json({ error: error.message }, { status: 500 });
+      }
       return NextResponse.json(data);
     } else {
+      // Kiểm tra trùng tên trước khi thêm mới → báo lỗi thân thiện
+      const { data: existed } = await supabaseAdmin
+        .from('pbh_models')
+        .select('id')
+        .eq('model_name', payload.model_name)
+        .maybeSingle();
+      if (existed) {
+        return NextResponse.json({ error: `Model "${payload.model_name}" đã tồn tại.` }, { status: 409 });
+      }
+
       // Insert
       const { data, error } = await supabaseAdmin
         .from('pbh_models')
@@ -65,7 +80,12 @@ export async function POST(request: NextRequest) {
         .select()
         .single();
 
-      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+      if (error) {
+        if (error.code === '23505') {
+          return NextResponse.json({ error: `Model "${payload.model_name}" đã tồn tại.` }, { status: 409 });
+        }
+        return NextResponse.json({ error: error.message }, { status: 500 });
+      }
       return NextResponse.json(data);
     }
   } catch (err: any) {
