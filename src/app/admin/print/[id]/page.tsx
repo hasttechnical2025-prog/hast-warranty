@@ -234,7 +234,7 @@ export default function PrintTicketPage() {
           <div
             className="absolute font-semibold text-slate-800 text-center"
             style={{
-              top: "33mm",
+              top: "32.2mm",
               left: "163mm",
               width: "10mm",
               fontSize: "13px",
@@ -247,7 +247,7 @@ export default function PrintTicketPage() {
           <div
             className="absolute font-semibold text-slate-800 text-center"
             style={{
-              top: "33mm",
+              top: "32.2mm",
               left: "182mm",
               width: "10mm",
               fontSize: "13px",
@@ -260,7 +260,7 @@ export default function PrintTicketPage() {
           <div
             className="absolute font-semibold text-slate-800 text-center"
             style={{
-              top: "33mm",
+              top: "32.2mm",
               left: "195mm",
               width: "14mm",
               fontSize: "13px",
@@ -288,7 +288,7 @@ export default function PrintTicketPage() {
           <div
             className="absolute font-semibold text-slate-800 overflow-hidden text-ellipsis"
             style={{
-              top: "48.4mm",
+              top: "49mm",
               left: "24mm",
               width: "172mm",
               fontSize: "13px",
@@ -303,7 +303,7 @@ export default function PrintTicketPage() {
           <div
             className="absolute text-slate-800"
             style={{
-              top: "55.2mm",
+              top: "55.8mm",
               left: "51mm",
               fontSize: "13px",
             }}
@@ -315,7 +315,7 @@ export default function PrintTicketPage() {
           <div
             className="absolute text-slate-800"
             style={{
-              top: "55.2mm",
+              top: "55.8mm",
               left: "122mm",
               fontSize: "13px",
             }}
@@ -327,7 +327,7 @@ export default function PrintTicketPage() {
           <div
             className="absolute font-medium text-slate-800"
             style={{
-              top: "61.1mm",
+              top: "61.5mm",
               left: "41mm",
               fontSize: "13px",
             }}
@@ -339,8 +339,8 @@ export default function PrintTicketPage() {
           <div
             className="absolute font-medium text-slate-800"
             style={{
-              top: "61.1mm",
-              left: "129mm",
+              top: "61.5mm",
+              left: "131mm",
               fontSize: "13px",
             }}
           >
@@ -351,7 +351,7 @@ export default function PrintTicketPage() {
           <div
             className="absolute font-bold text-slate-900"
             style={{
-              top: "67mm",
+              top: "67.3mm",
               left: "22mm",
               fontSize: "14px",
             }}
@@ -363,7 +363,7 @@ export default function PrintTicketPage() {
           <div
             className="absolute font-bold text-slate-900"
             style={{
-              top: "67mm",
+              top: "67.3mm",
               left: "125mm",
               fontSize: "14px",
               letterSpacing: "0.5px",
@@ -376,7 +376,7 @@ export default function PrintTicketPage() {
           <div
             className="absolute font-medium text-slate-800"
             style={{
-              top: "73.6mm",
+              top: "73.9mm",
               left: "48mm",
               fontSize: "13px",
             }}
@@ -418,7 +418,7 @@ export default function PrintTicketPage() {
           <div
             className="absolute font-bold text-slate-900 text-center"
             style={{
-              top: "92.2mm",
+              top: "92.6mm",
               left: "42mm",
               width: "25mm",
               fontSize: "13px",
@@ -431,7 +431,7 @@ export default function PrintTicketPage() {
           <div
             className="absolute font-bold text-slate-900 text-center"
             style={{
-              top: "92.2mm",
+              top: "92.6mm",
               left: "106mm",
               width: "12mm",
               fontSize: "13px",
