@@ -2,7 +2,26 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { DateField } from "@/components/DateField";
-import { ShieldCheck, User, MapPin, Cpu, Hash, FileText, Settings, Award } from "lucide-react";
+import {
+  ShieldCheck,
+  User,
+  MapPin,
+  Cpu,
+  Hash,
+  CircleCheck,
+  QrCode,
+  Cloud,
+  Printer,
+  Building2,
+  House,
+  Send,
+  BadgeCheck,
+  Info,
+} from "lucide-react";
+
+// Lớp dùng chung cho input để đồng bộ giao diện toàn form.
+const inputBase =
+  "w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/15";
 
 interface Model {
   id: number;
@@ -226,146 +245,213 @@ export default function RegisterWarrantyPage() {
     }
   };
 
-  return (
-    <div className="max-w-3xl mx-auto px-4 py-8 w-full flex-1 flex flex-col justify-center">
-      {successTicket ? (
-        <div className="bg-white p-8 rounded-xl shadow-md border border-emerald-100 text-center flex flex-col items-center gap-6">
-          <div className="bg-emerald-100 p-4 rounded-full text-emerald-600">
-            <ShieldCheck className="h-16 w-16" />
+  const selectedModelData = models.find((m) => m.model_name === selectedModel);
+  const soBanChupNum = Number(soBanChup);
+
+  // ---- Màn hình thành công ----
+  if (successTicket) {
+    return (
+      <div className="w-full flex-1 flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-lg rounded-3xl border border-emerald-100 bg-white p-8 text-center shadow-xl shadow-emerald-100/40">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 ring-8 ring-emerald-50">
+            <CircleCheck className="h-11 w-11" />
           </div>
-          <div>
-            <h2 className="text-2xl font-bold text-slate-800">Đăng ký thành công!</h2>
-            <p className="text-slate-500 mt-2">
-              Phiếu bảo hành số <strong className="text-emerald-600 text-lg">#{successTicket.so_phieu}</strong> đã được lưu lên hệ thống và gửi thông báo in.
-            </p>
+          <h2 className="mt-6 text-2xl font-bold text-slate-800">Đăng ký thành công!</h2>
+          <p className="mt-2 text-sm text-slate-500">
+            Yêu cầu cấp phiếu đã được lưu lên hệ thống và gửi thông báo in.
+          </p>
+
+          <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 px-6 py-5">
+            <div className="text-xs font-medium uppercase tracking-wide text-slate-400">
+              Số phiếu bảo hành
+            </div>
+            <div className="mt-1 text-4xl font-extrabold text-emerald-600">
+              #{successTicket.so_phieu}
+            </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 w-full justify-center">
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
             <button
               onClick={resetForm}
-              className="px-6 py-3 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition shadow-sm"
+              className="flex-1 rounded-xl bg-emerald-600 px-6 py-3 font-semibold text-white shadow-sm transition hover:bg-emerald-700 active:bg-emerald-800"
             >
               Đăng ký phiếu mới
             </button>
             <a
               href="/admin"
-              className="px-6 py-3 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 transition text-center"
+              className="flex-1 rounded-xl bg-slate-100 px-6 py-3 text-center font-semibold text-slate-700 transition hover:bg-slate-200"
             >
               Vào danh sách duyệt in
             </a>
           </div>
         </div>
-      ) : (
-        <div className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
-          <div className="bg-emerald-600 px-6 py-4 text-white flex items-center gap-3">
-            <Award className="h-6 w-6" />
-            <div>
-              <h1 className="font-bold text-lg">ĐĂNG KÝ PHIẾU BẢO HÀNH MỚI</h1>
-              <p className="text-xs text-emerald-100">Dành cho nhân viên kinh doanh / dịch vụ</p>
+      </div>
+    );
+  }
+
+  // ---- Biểu mẫu đăng ký ----
+  return (
+    <div className="w-full flex-1 px-4 py-8 sm:py-10">
+      <div className="mx-auto grid w-full max-w-5xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
+        {/* ===== Panel thương hiệu ===== */}
+        <aside className="relative flex flex-col justify-between overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-600 to-teal-700 p-8 text-white">
+          <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-white/10" />
+          <div className="pointer-events-none absolute -bottom-20 -left-10 h-48 w-48 rounded-full bg-white/5" />
+
+          <div className="relative">
+            <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 ring-1 ring-white/25 backdrop-blur">
+              <ShieldCheck className="h-7 w-7" />
             </div>
+            <h1 className="mt-6 text-2xl font-bold leading-tight">Phiếu bảo hành điện tử</h1>
+            <p className="mt-2 text-sm leading-relaxed text-emerald-50/90">
+              Tạo và cấp phiếu bảo hành cho khách hàng chỉ trong một biểu mẫu — nhanh, chính xác, có mã QR tra cứu.
+            </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          <ul className="relative mt-8 space-y-4">
+            {[
+              { icon: QrCode, text: "Khách quét mã QR tự tra cứu bảo hành" },
+              { icon: Cloud, text: "Lưu trữ tập trung, không lo thất lạc" },
+              { icon: Printer, text: "In khớp phôi giấy A5 ngang có sẵn" },
+            ].map(({ icon: Icon, text }) => (
+              <li key={text} className="flex items-start gap-3">
+                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/15 ring-1 ring-white/20">
+                  <Icon className="h-4 w-4" />
+                </span>
+                <span className="text-sm leading-snug text-emerald-50/95">{text}</span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="relative mt-8 border-t border-white/15 pt-5 text-xs text-emerald-50/80">
+            HSTC · Hệ thống Bảo hành
+          </div>
+        </aside>
+
+        {/* ===== Biểu mẫu ===== */}
+        <div className="p-6 sm:p-8">
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="text-lg font-bold text-slate-800">Đăng ký phiếu mới</h2>
+            <span className="text-xs text-slate-400">
+              <span className="text-red-500">*</span> Bắt buộc
+            </span>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-8">
             {errorMsg && (
-              <div className="p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded text-sm">
-                {errorMsg}
+              <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                <Info className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>{errorMsg}</span>
               </div>
             )}
 
-            {/* Ngày */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-4 py-3 border-b border-slate-100">
-              <label className="text-sm font-semibold text-slate-700 sm:w-52 shrink-0">
-                Ngày
-              </label>
-              <div className="w-full flex-1">
-                <div className="w-48">
-                  <DateField
-                    value={ngayMua}
-                    onChange={setNgayMua}
-                  />
+            {/* ---- Bước 1: Khách hàng ---- */}
+            <section className="space-y-4">
+              <div className="flex items-center gap-3">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 text-sm font-bold text-white">
+                  1
+                </span>
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4 text-emerald-600" />
+                  <h3 className="font-semibold text-slate-800">Thông tin khách hàng</h3>
                 </div>
               </div>
-            </div>
 
-            {/* Tên khách hàng (với suggestions) */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-4 py-3 border-b border-slate-100">
-              <label className="text-sm font-semibold text-slate-700 sm:w-52 shrink-0 flex items-center gap-1">
-                <User className="h-4 w-4 text-slate-400" />
-                Tên khách hàng <span className="text-red-500">*</span>
-              </label>
-              <div className="w-full flex-1 relative" ref={suggestionRef}>
-                <input
-                  type="text"
-                  value={tenKhachHang}
-                  onChange={(e) => handleNameChange(e.target.value)}
-                  onFocus={() => setShowCustSuggestions(true)}
-                  placeholder="Nhập hoặc dán tên khách hàng..."
-                  className="w-full max-w-xl px-3 py-2 border border-slate-300 rounded-md bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  required
-                />
-
-                {/* Suggestions Dropdown */}
-                {showCustSuggestions && customers.length > 0 && (
-                  <div className="absolute top-[100%] left-0 w-full max-w-xl bg-white border border-slate-200 rounded-md shadow-lg z-20 mt-1 max-h-60 overflow-y-auto">
-                    <div className="px-3 py-1.5 bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500">
-                      Gợi ý khách hàng cũ (Fuzzy Match):
-                    </div>
-                    {customers.map((cust) => (
-                      <button
-                        key={cust.id}
-                        type="button"
-                        onClick={() => selectCustomer(cust)}
-                        className="w-full text-left px-4 py-2 text-sm hover:bg-slate-50 flex flex-col gap-0.5 border-b border-slate-50"
-                      >
-                        <span className="font-semibold text-slate-800">{cust.ten_khach_hang}</span>
-                        <span className="text-xs text-slate-500 line-clamp-1">{cust.dia_chi}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Địa chỉ */}
-            <div className="flex flex-col sm:flex-row sm:items-start gap-1.5 sm:gap-4 py-3 border-b border-slate-100">
-              <label className="text-sm font-semibold text-slate-700 sm:w-52 shrink-0 flex items-center gap-1 pt-1.5">
-                <MapPin className="h-4 w-4 text-slate-400" />
-                Địa chỉ khách hàng <span className="text-red-500">*</span>
-              </label>
-              <div className="w-full flex-1">
-                <textarea
-                  value={diaChi}
-                  onChange={(e) => setDiaChi(e.target.value)}
-                  placeholder="Nhập hoặc dán địa chỉ khách hàng..."
-                  className="w-full max-w-2xl px-3 py-2 border border-slate-300 rounded-md bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 h-20 resize-none"
-                  required
-                />
-              </div>
-            </div>
-
-            <hr className="border-slate-200" />
-
-            {/* Thông tin máy */}
-            <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 space-y-4">
-              <h3 className="font-semibold text-sm text-slate-700 flex items-center gap-1.5">
-                <Cpu className="h-4.5 w-4.5 text-emerald-600" />
-                Thông tin sản phẩm bán
-              </h3>
-
-              <div className="space-y-4">
-                {/* Model */}
-                <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-4 py-3 border-b border-slate-200/50">
-                  <label className="text-sm font-semibold text-slate-700 sm:w-52 shrink-0">
-                    Model sản phẩm <span className="text-red-500">*</span>
+              <div className="space-y-4 sm:pl-11">
+                {/* Ngày lập phiếu */}
+                <div className="w-full sm:max-w-[220px]">
+                  <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                    Ngày lập phiếu
                   </label>
-                  <div className="w-full flex-1">
+                  <DateField value={ngayMua} onChange={setNgayMua} />
+                </div>
+
+                {/* Tên khách hàng */}
+                <div className="relative" ref={suggestionRef}>
+                  <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                    Tên khách hàng <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="text"
+                      value={tenKhachHang}
+                      onChange={(e) => handleNameChange(e.target.value)}
+                      onFocus={() => setShowCustSuggestions(true)}
+                      placeholder="Nhập hoặc dán tên khách hàng..."
+                      className={`${inputBase} pl-10`}
+                      required
+                    />
+                  </div>
+
+                  {/* Gợi ý khách hàng cũ */}
+                  {showCustSuggestions && customers.length > 0 && (
+                    <div className="absolute left-0 top-[100%] z-20 mt-1.5 max-h-60 w-full overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-lg">
+                      <div className="border-b border-slate-100 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-500">
+                        Gợi ý khách hàng cũ
+                      </div>
+                      {customers.map((cust) => (
+                        <button
+                          key={cust.id}
+                          type="button"
+                          onClick={() => selectCustomer(cust)}
+                          className="flex w-full flex-col gap-0.5 border-b border-slate-50 px-4 py-2 text-left text-sm transition hover:bg-emerald-50"
+                        >
+                          <span className="font-semibold text-slate-800">{cust.ten_khach_hang}</span>
+                          <span className="line-clamp-1 text-xs text-slate-500">{cust.dia_chi}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Địa chỉ */}
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                    Địa chỉ khách hàng <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <MapPin className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                    <textarea
+                      value={diaChi}
+                      onChange={(e) => setDiaChi(e.target.value)}
+                      placeholder="Nhập hoặc dán địa chỉ khách hàng..."
+                      className={`${inputBase} h-20 resize-none pl-10`}
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* ---- Bước 2: Sản phẩm ---- */}
+            <section className="space-y-4">
+              <div className="flex items-center gap-3">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 text-sm font-bold text-white">
+                  2
+                </span>
+                <div className="flex items-center gap-2">
+                  <Cpu className="h-4 w-4 text-emerald-600" />
+                  <h3 className="font-semibold text-slate-800">Thông tin sản phẩm</h3>
+                </div>
+              </div>
+
+              <div className="space-y-4 sm:pl-11">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {/* Model */}
+                  <div>
+                    <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                      Model sản phẩm <span className="text-red-500">*</span>
+                    </label>
                     <select
                       value={selectedModel}
                       onChange={(e) => handleModelChange(e.target.value)}
-                      className="w-full max-w-xs px-3 py-2 border border-slate-300 rounded-md bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className={inputBase}
                       required
                     >
-                      <option value="">-- Chọn Model --</option>
+                      <option value="">
+                        {loadingModels ? "Đang tải danh sách..." : "-- Chọn Model --"}
+                      </option>
                       {models.map((m) => (
                         <option key={m.id} value={m.model_name}>
                           {m.model_name} ({m.hang_sx})
@@ -373,155 +459,195 @@ export default function RegisterWarrantyPage() {
                       ))}
                     </select>
                   </div>
+
+                  {/* Serial */}
+                  <div>
+                    <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                      Số serial
+                    </label>
+                    <div className="relative">
+                      <Hash className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                      <input
+                        type="text"
+                        value={serial}
+                        onChange={(e) => handleSerialChange(e.target.value)}
+                        placeholder="Ví dụ: 600186"
+                        className={`${inputBase} pl-10 font-mono tracking-wide`}
+                      />
+                    </div>
+                  </div>
                 </div>
 
-                {/* Serial */}
-                <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-4 py-3">
-                  <label className="text-sm font-semibold text-slate-700 sm:w-52 shrink-0 flex items-center gap-1">
-                    <Hash className="h-4 w-4 text-slate-400" />
-                    Số serial
+                {/* Thông số tự điền theo model */}
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  {[
+                    { label: "Hãng sản xuất", value: hangSx },
+                    { label: "Loại sản phẩm", value: loaiSanPham },
+                    { label: "Cấu hình", value: cauHinh },
+                  ].map(({ label, value }) => (
+                    <div
+                      key={label}
+                      className={`rounded-xl border px-3.5 py-2.5 transition ${
+                        value
+                          ? "border-emerald-200 bg-emerald-50"
+                          : "border-dashed border-slate-200 bg-slate-50"
+                      }`}
+                    >
+                      <div
+                        className={`text-[11px] font-medium uppercase tracking-wide ${
+                          value ? "text-emerald-600" : "text-slate-400"
+                        }`}
+                      >
+                        {label}
+                      </div>
+                      <div
+                        className={`mt-0.5 truncate text-sm font-semibold ${
+                          value ? "text-slate-800" : "text-slate-400"
+                        }`}
+                      >
+                        {value || "Tự điền theo model"}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            {/* ---- Bước 3: Chế độ bảo hành ---- */}
+            <section className="space-y-4">
+              <div className="flex items-center gap-3">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 text-sm font-bold text-white">
+                  3
+                </span>
+                <div className="flex items-center gap-2">
+                  <BadgeCheck className="h-4 w-4 text-emerald-600" />
+                  <h3 className="font-semibold text-slate-800">Chế độ &amp; địa điểm bảo hành</h3>
+                </div>
+              </div>
+
+              <div className="space-y-4 sm:pl-11">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {/* Số bản chụp */}
+                  <div>
+                    <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                      Hạn mức bản chụp <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        value={soBanChup}
+                        onChange={(e) => setSoBanChup(e.target.value)}
+                        placeholder="Ví dụ: 100000"
+                        className={`${inputBase} pr-12`}
+                        required
+                      />
+                      <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-sm text-slate-400">
+                        bản
+                      </span>
+                    </div>
+                    <span className="mt-1 block text-[11px] text-slate-400">
+                      {soBanChupNum > 0
+                        ? `≈ ${soBanChupNum.toLocaleString("vi-VN")} bản chụp`
+                        : selectedModelData
+                        ? `Mặc định model: ${Number(selectedModelData.so_ban_chup_mac_dinh).toLocaleString("vi-VN")}`
+                        : " "}
+                    </span>
+                  </div>
+
+                  {/* Số tháng */}
+                  <div>
+                    <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                      Thời hạn <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        value={soThang}
+                        onChange={(e) => setSoThang(e.target.value)}
+                        placeholder="Ví dụ: 12"
+                        className={`${inputBase} pr-16`}
+                        required
+                      />
+                      <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-sm text-slate-400">
+                        tháng
+                      </span>
+                    </div>
+                    <span className="mt-1 block text-[11px] text-slate-400">
+                      {selectedModelData
+                        ? `Mặc định model: ${selectedModelData.so_thang_mac_dinh} tháng`
+                        : " "}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Địa điểm bảo hành - nút phân đoạn */}
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                    Địa điểm bảo hành
                   </label>
-                  <div className="w-full flex-1">
-                    <input
-                      type="text"
-                      value={serial}
-                      onChange={(e) => handleSerialChange(e.target.value)}
-                      placeholder="Ví dụ: 600186"
-                      className="w-full max-w-xs px-3 py-2 border border-slate-300 rounded-md bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono"
-                    />
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { value: "Tại khách hàng", icon: House, desc: "Kỹ thuật đến tận nơi" },
+                      { value: "Tại trung tâm", icon: Building2, desc: "Khách mang máy đến" },
+                    ].map(({ value, icon: Icon, desc }) => {
+                      const active = diaDiemBaoHanh === value;
+                      return (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => setDiaDiemBaoHanh(value)}
+                          className={`flex items-center gap-3 rounded-xl border p-3 text-left transition ${
+                            active
+                              ? "border-emerald-500 bg-emerald-50 ring-4 ring-emerald-500/10"
+                              : "border-slate-200 bg-white hover:border-slate-300"
+                          }`}
+                        >
+                          <span
+                            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
+                              active ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-500"
+                            }`}
+                          >
+                            <Icon className="h-5 w-5" />
+                          </span>
+                          <span className="min-w-0">
+                            <span
+                              className={`block text-sm font-semibold ${
+                                active ? "text-emerald-700" : "text-slate-700"
+                              }`}
+                            >
+                              {value}
+                            </span>
+                            <span className="block truncate text-[11px] text-slate-400">{desc}</span>
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
+            </section>
 
-              {/* Locked/Auto-filled Fields */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-slate-500">
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs font-medium">Hãng sản xuất</span>
-                  <input
-                    type="text"
-                    value={hangSx}
-                    disabled
-                    placeholder="Chạy theo model"
-                    className="w-full px-3 py-1.5 border border-slate-200 rounded-md bg-slate-100 text-slate-500 text-sm cursor-not-allowed"
-                  />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs font-medium">Loại sản phẩm</span>
-                  <input
-                    type="text"
-                    value={loaiSanPham}
-                    disabled
-                    placeholder="Chạy theo model"
-                    className="w-full px-3 py-1.5 border border-slate-200 rounded-md bg-slate-100 text-slate-500 text-sm cursor-not-allowed"
-                  />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs font-medium">Cấu hình sản phẩm</span>
-                  <input
-                    type="text"
-                    value={cauHinh}
-                    disabled
-                    placeholder="Chạy theo model"
-                    className="w-full px-3 py-1.5 border border-slate-200 rounded-md bg-slate-100 text-slate-500 text-sm cursor-not-allowed"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <hr className="border-slate-200" />
-
-            {/* Điều khoản bảo hành */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-sm text-slate-700 flex items-center gap-1.5">
-                <FileText className="h-4.5 w-4.5 text-emerald-600" />
-                Điều khoản & Địa điểm bảo hành
-              </h3>
-
-              <div className="flex flex-col sm:flex-row items-start gap-4">
-                {/* Số bản chụp */}
-                <div className="w-full sm:w-48 flex flex-col gap-1.5">
-                  <label className="text-sm font-medium text-slate-700">
-                    Thời hạn bảo hành (bản chụp)
-                  </label>
-                  <input
-                    type="number"
-                    value={soBanChup}
-                    onChange={(e) => setSoBanChup(e.target.value)}
-                    placeholder="Ví dụ: 100000"
-                    className="w-full px-3 py-2 border border-slate-300 rounded-md bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    required
-                  />
-                  {selectedModel && (
-                    <span className="text-[11px] text-slate-400">
-                      Mặc định Model: {Number(models.find(m => m.model_name === selectedModel)?.so_ban_chup_mac_dinh || 0).toLocaleString('vi-VN')}
-                    </span>
-                  )}
-                </div>
-
-                {/* Số tháng */}
-                <div className="w-full sm:w-36 flex flex-col gap-1.5">
-                  <label className="text-sm font-medium text-slate-700">
-                    Thời hạn bảo hành (tháng)
-                  </label>
-                  <input
-                    type="number"
-                    value={soThang}
-                    onChange={(e) => setSoThang(e.target.value)}
-                    placeholder="Ví dụ: 12"
-                    className="w-full px-3 py-2 border border-slate-300 rounded-md bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                    required
-                  />
-                  {selectedModel && (
-                    <span className="text-[11px] text-slate-400">
-                      Mặc định Model: {models.find(m => m.model_name === selectedModel)?.so_thang_mac_dinh || 0} tháng
-                    </span>
-                  )}
-                </div>
-
-                {/* Địa điểm bảo hành (Khung mờ) */}
-                <div className="w-full sm:flex-1 bg-slate-50 border border-slate-200/60 p-3 rounded-lg flex flex-col gap-1.5">
-                  <span className="text-sm font-medium text-slate-750">Địa điểm bảo hành</span>
-                  <div className="flex gap-5 text-sm whitespace-nowrap py-1">
-                    <label className="flex items-center gap-1.5 cursor-pointer text-slate-700">
-                      <input
-                        type="radio"
-                        name="diaDiem"
-                        value="Tại khách hàng"
-                        checked={diaDiemBaoHanh === "Tại khách hàng"}
-                        onChange={(e) => setDiaDiemBaoHanh(e.target.value)}
-                        className="text-emerald-600 focus:ring-emerald-500 h-4 w-4"
-                      />
-                      Tại khách hàng
-                    </label>
-                    <label className="flex items-center gap-1.5 cursor-pointer text-slate-700">
-                      <input
-                        type="radio"
-                        name="diaDiem"
-                        value="Tại trung tâm"
-                        checked={diaDiemBaoHanh === "Tại trung tâm"}
-                        onChange={(e) => setDiaDiemBaoHanh(e.target.value)}
-                        className="text-emerald-600 focus:ring-emerald-500 h-4 w-4"
-                      />
-                      Tại Trung tâm
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Buttons */}
-            <div className="pt-4">
+            {/* Nút gửi */}
+            <div className="border-t border-slate-100 pt-6">
               <button
                 type="submit"
-                disabled={submitting || !tenKhachHang.trim() || !diaChi.trim() || !selectedModel || !soBanChup.trim() || !soThang.trim()}
-                className="w-full py-3 bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700 active:bg-emerald-800 transition disabled:bg-slate-200 disabled:text-slate-400 shadow-sm"
+                disabled={
+                  submitting ||
+                  !tenKhachHang.trim() ||
+                  !diaChi.trim() ||
+                  !selectedModel ||
+                  !soBanChup.trim() ||
+                  !soThang.trim()
+                }
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 py-3.5 font-bold text-white shadow-sm shadow-emerald-500/20 transition hover:from-emerald-700 hover:to-teal-700 active:from-emerald-800 active:to-teal-800 disabled:from-slate-200 disabled:to-slate-200 disabled:text-slate-400 disabled:shadow-none"
               >
-                {submitting ? "Đang gửi yêu cầu..." : "GỬI YÊU CẦU CẤP PHIẾU"}
+                <Send className="h-5 w-5" />
+                {submitting ? "Đang gửi yêu cầu..." : "Gửi yêu cầu cấp phiếu"}
               </button>
             </div>
           </form>
         </div>
-      )}
+      </div>
     </div>
   );
 }
