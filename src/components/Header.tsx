@@ -3,12 +3,23 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Award, ShieldAlert, List, Settings, LogOut, Crop } from "lucide-react";
+import { Award, ShieldAlert, List, Settings, LogOut, Crop, SlidersHorizontal } from "lucide-react";
+import { DEFAULT_SETTINGS, type AppSettings } from "@/lib/settings";
 
 export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d && !d.error) setSettings(d);
+      })
+      .catch(() => {});
+  }, [pathname]);
 
   const checkAuth = async () => {
     try {
@@ -40,18 +51,27 @@ export function Header() {
   const isDuyetIn = pathname === "/admin" || pathname.startsWith("/admin/print");
   const isCauHinh = pathname === "/admin/models";
   const isCanPhoi = pathname === "/admin/can-phoi";
+  const isCaiDat = pathname === "/admin/cai-dat";
 
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm no-print">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-2">
-            <div className="bg-emerald-600 p-2 rounded-lg text-white">
-              <Award className="h-5 w-5" />
-            </div>
+            {settings.logo_data_url ? (
+              <img
+                src={settings.logo_data_url}
+                alt="logo"
+                className="h-9 w-9 rounded-lg object-contain"
+              />
+            ) : (
+              <div className="bg-emerald-600 p-2 rounded-lg text-white">
+                <Award className="h-5 w-5" />
+              </div>
+            )}
             <div>
-              <span className="font-bold text-slate-800 text-lg tracking-tight">HSTC Warranty</span>
-              <span className="text-xs text-emerald-600 font-semibold block -mt-1">Hệ thống Bảo hành</span>
+              <span className="font-bold text-slate-800 text-lg tracking-tight">{settings.system_name}</span>
+              <span className="text-xs text-emerald-600 font-semibold block -mt-1">{settings.system_subtitle}</span>
             </div>
           </div>
 
@@ -104,6 +124,18 @@ export function Header() {
                 >
                   <Crop className="h-4 w-4" />
                   <span>Căn phôi</span>
+                </Link>
+
+                <Link
+                  href="/admin/cai-dat"
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isCaiDat
+                      ? "bg-emerald-50 text-emerald-700"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                  }`}
+                >
+                  <SlidersHorizontal className="h-4 w-4" />
+                  <span>Cài đặt</span>
                 </Link>
 
                 <button

@@ -70,11 +70,15 @@ export async function POST(request: NextRequest) {
       dia_diem_bao_hanh,
       so_ban_chup,
       so_thang,
+      nguoi_dang_ky,
       khach_hang_id, // can be passed if selected from lookup
     } = body;
 
     if (!ten_khach_hang || !dia_chi || !model_name) {
       return NextResponse.json({ error: "Thiếu thông tin bắt buộc (Khách hàng, Địa chỉ, Model)" }, { status: 400 });
+    }
+    if (!nguoi_dang_ky || !String(nguoi_dang_ky).trim()) {
+      return NextResponse.json({ error: "Vui lòng nhập tên người đăng ký" }, { status: 400 });
     }
 
     // Clean serial: keep only uppercase alpha-numeric characters (or leave empty)
@@ -149,6 +153,7 @@ export async function POST(request: NextRequest) {
       dia_diem_bao_hanh,
       so_ban_chup: Number(so_ban_chup),
       so_thang: Number(so_thang),
+      nguoi_dang_ky: String(nguoi_dang_ky).trim(),
       ma_tra_cuu: lookupCode,
       trang_thai: 'cho_in'
     };
@@ -157,21 +162,33 @@ export async function POST(request: NextRequest) {
       ticketData.ngay_mua = ngay_mua;
     }
 
-    const { data: newTicket, error: ticketErr } = await supabaseAdmin
+    let { data: newTicket, error: ticketErr } = await supabaseAdmin
       .from('pbh_phieu_bao_hanh')
       .insert(ticketData)
       .select('id, so_phieu')
       .single();
 
-    if (ticketErr) {
+    // Phòng thủ: nếu chưa chạy migration 003 (cột nguoi_dang_ky chưa có) -> tạo phiếu
+    // không kèm cột đó thay vì để đăng ký thất bại.
+    if (ticketErr && /nguoi_dang_ky/.test(ticketErr.message || "")) {
+      const { nguoi_dang_ky: _omit, ...withoutCol } = ticketData;
+      ({ data: newTicket, error: ticketErr } = await supabaseAdmin
+        .from('pbh_phieu_bao_hanh')
+        .insert(withoutCol)
+        .select('id, so_phieu')
+        .single());
+    }
+
+    if (ticketErr || !newTicket) {
       console.error("Error creating ticket:", ticketErr);
-      return NextResponse.json({ error: ticketErr.message }, { status: 500 });
+      return NextResponse.json({ error: ticketErr?.message || "Không tạo được phiếu" }, { status: 500 });
     }
 
     // 4. Send Telegram Notification
     const tgMessage = `📝 <b>YÊU CẦU CẤP PHIẾU BẢO HÀNH MỚI</b>\n` +
       `-----------------------------------------\n` +
       `• <b>Số phiếu:</b> #${newTicket.so_phieu}\n` +
+      `• <b>Người đăng ký:</b> ${String(nguoi_dang_ky).trim()}\n` +
       `• <b>Khách hàng:</b> ${ten_khach_hang.trim()}\n` +
       `• <b>Địa chỉ:</b> ${dia_chi.trim()}\n` +
       `• <b>Model:</b> ${model_name} ${cleanedSerial ? `(S/N: ${cleanedSerial})` : '(Chưa có Serial)'}\n` +

@@ -31,7 +31,7 @@ export async function PUT(
 
     const textFields = [
       'ten_khach_hang', 'dia_chi', 'model_name',
-      'loai_san_pham', 'hang_sx', 'cau_hinh', 'dia_diem_bao_hanh', 'ngay_mua',
+      'loai_san_pham', 'hang_sx', 'cau_hinh', 'dia_diem_bao_hanh', 'ngay_mua', 'nguoi_dang_ky',
     ] as const;
     for (const k of textFields) {
       if (body[k] !== undefined && body[k] !== null) {
@@ -65,10 +65,23 @@ export async function PUT(
       return NextResponse.json({ error: "Không có gì để cập nhật" }, { status: 400 });
     }
 
-    const { error: updateErr } = await supabaseAdmin
+    let { error: updateErr } = await supabaseAdmin
       .from('pbh_phieu_bao_hanh')
       .update(update)
       .eq('id', id);
+
+    // Phòng thủ: cột nguoi_dang_ky chưa migrate -> cập nhật các trường còn lại
+    if (updateErr && /nguoi_dang_ky/.test(updateErr.message || "")) {
+      const { nguoi_dang_ky: _omit, ...rest } = update;
+      if (Object.keys(rest).length > 0) {
+        ({ error: updateErr } = await supabaseAdmin
+          .from('pbh_phieu_bao_hanh')
+          .update(rest)
+          .eq('id', id));
+      } else {
+        updateErr = null;
+      }
+    }
 
     if (updateErr) {
       return NextResponse.json({ error: updateErr.message }, { status: 500 });

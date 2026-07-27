@@ -2,9 +2,11 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { DateField } from "@/components/DateField";
+import { DEFAULT_SETTINGS, type AppSettings } from "@/lib/settings";
 import {
   ShieldCheck,
   User,
+  UserCheck,
   MapPin,
   Cpu,
   Hash,
@@ -18,6 +20,9 @@ import {
   BadgeCheck,
   Info,
 } from "lucide-react";
+
+// Icon cho các dòng lợi ích ở panel trái (lặp lại nếu nhiều hơn số icon).
+const BENEFIT_ICONS = [QrCode, Cloud, Printer];
 
 // Lớp dùng chung cho input để đồng bộ giao diện toàn form.
 const inputBase =
@@ -42,6 +47,7 @@ interface Customer {
 export default function RegisterWarrantyPage() {
   // Form State
   const [ngayMua, setNgayMua] = useState<string>("");
+  const [nguoiDangKy, setNguoiDangKy] = useState<string>("");
   const [tenKhachHang, setTenKhachHang] = useState<string>("");
   const [khachHangId, setKhachHangId] = useState<number | null>(null);
   const [diaChi, setDiaChi] = useState<string>("");
@@ -62,6 +68,7 @@ export default function RegisterWarrantyPage() {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [successTicket, setSuccessTicket] = useState<{ id: number; so_phieu: number } | null>(null);
   const [errorMsg, setErrorMsg] = useState<string>("");
+  const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
 
   const suggestionRef = useRef<HTMLDivElement>(null);
 
@@ -72,6 +79,16 @@ export default function RegisterWarrantyPage() {
     const mm = String(today.getMonth() + 1).padStart(2, "0");
     const dd = String(today.getDate()).padStart(2, "0");
     setNgayMua(`${yyyy}-${mm}-${dd}`);
+  }, []);
+
+  // Fetch cấu hình hệ thống (thương hiệu, panel)
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && !data.error) setSettings(data);
+      })
+      .catch(() => {});
   }, []);
 
   // Fetch default models
@@ -149,7 +166,7 @@ export default function RegisterWarrantyPage() {
 
   // Handle customer suggestion click
   const selectCustomer = (cust: Customer) => {
-    setTenKhachHang(cust.ten_khach_hang);
+    setTenKhachHang((cust.ten_khach_hang || "").toUpperCase());
     setDiaChi(cust.dia_chi);
     setKhachHangId(cust.id);
     setShowCustSuggestions(false);
@@ -157,12 +174,13 @@ export default function RegisterWarrantyPage() {
 
   // Check if manually changing customer name -> disconnect from previous ID
   const handleNameChange = (val: string) => {
-    setTenKhachHang(val);
+    setTenKhachHang(val.toUpperCase()); // tên khách mặc định IN HOA
     setKhachHangId(null); // clear relation if name changes
     setShowCustSuggestions(true);
   };
 
   const resetForm = () => {
+    setNguoiDangKy("");
     setTenKhachHang("");
     setKhachHangId(null);
     setDiaChi("");
@@ -188,6 +206,10 @@ export default function RegisterWarrantyPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!nguoiDangKy.trim()) {
+      setErrorMsg("Vui lòng nhập tên người đăng ký.");
+      return;
+    }
     if (!tenKhachHang.trim()) {
       setErrorMsg("Vui lòng điền tên khách hàng.");
       return;
@@ -214,6 +236,7 @@ export default function RegisterWarrantyPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ngay_mua: ngayMua,
+          nguoi_dang_ky: nguoiDangKy,
           ten_khach_hang: tenKhachHang,
           dia_chi: diaChi,
           model_name: selectedModel,
@@ -299,32 +322,33 @@ export default function RegisterWarrantyPage() {
           <div className="pointer-events-none absolute -bottom-20 -left-10 h-48 w-48 rounded-full bg-white/5" />
 
           <div className="relative">
-            <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 ring-1 ring-white/25 backdrop-blur">
-              <ShieldCheck className="h-7 w-7" />
+            <div className="inline-flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-white/15 ring-1 ring-white/25 backdrop-blur">
+              {settings.logo_data_url ? (
+                <img src={settings.logo_data_url} alt="logo" className="h-full w-full object-contain" />
+              ) : (
+                <ShieldCheck className="h-7 w-7" />
+              )}
             </div>
-            <h1 className="mt-6 text-2xl font-bold leading-tight">Phiếu bảo hành điện tử</h1>
-            <p className="mt-2 text-sm leading-relaxed text-emerald-50/90">
-              Tạo và cấp phiếu bảo hành cho khách hàng chỉ trong một biểu mẫu — nhanh, chính xác, có mã QR tra cứu.
-            </p>
+            <h1 className="mt-6 text-2xl font-bold leading-tight">{settings.reg_panel_title}</h1>
+            <p className="mt-2 text-sm leading-relaxed text-emerald-50/90">{settings.reg_panel_desc}</p>
           </div>
 
           <ul className="relative mt-8 space-y-4">
-            {[
-              { icon: QrCode, text: "Khách quét mã QR tự tra cứu bảo hành" },
-              { icon: Cloud, text: "Lưu trữ tập trung, không lo thất lạc" },
-              { icon: Printer, text: "In khớp phôi giấy A5 ngang có sẵn" },
-            ].map(({ icon: Icon, text }) => (
-              <li key={text} className="flex items-start gap-3">
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/15 ring-1 ring-white/20">
-                  <Icon className="h-4 w-4" />
-                </span>
-                <span className="text-sm leading-snug text-emerald-50/95">{text}</span>
-              </li>
-            ))}
+            {settings.reg_panel_benefits.map((text, i) => {
+              const Icon = BENEFIT_ICONS[i % BENEFIT_ICONS.length];
+              return (
+                <li key={i} className="flex items-start gap-3">
+                  <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/15 ring-1 ring-white/20">
+                    <Icon className="h-4 w-4" />
+                  </span>
+                  <span className="text-sm leading-snug text-emerald-50/95">{text}</span>
+                </li>
+              );
+            })}
           </ul>
 
           <div className="relative mt-8 border-t border-white/15 pt-5 text-xs text-emerald-50/80">
-            HSTC · Hệ thống Bảo hành
+            {settings.reg_panel_footer}
           </div>
         </aside>
 
@@ -358,6 +382,24 @@ export default function RegisterWarrantyPage() {
               </div>
 
               <div className="space-y-4 sm:pl-11">
+                {/* Người đăng ký */}
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                    Người đăng ký <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <UserCheck className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="text"
+                      value={nguoiDangKy}
+                      onChange={(e) => setNguoiDangKy(e.target.value)}
+                      placeholder="Tên nhân viên lập phiếu..."
+                      className={`${inputBase} pl-10`}
+                      required
+                    />
+                  </div>
+                </div>
+
                 {/* Ngày lập phiếu */}
                 <div className="w-full sm:max-w-[220px]">
                   <label className="mb-1.5 block text-sm font-medium text-slate-700">
@@ -633,6 +675,7 @@ export default function RegisterWarrantyPage() {
                 type="submit"
                 disabled={
                   submitting ||
+                  !nguoiDangKy.trim() ||
                   !tenKhachHang.trim() ||
                   !diaChi.trim() ||
                   !selectedModel ||

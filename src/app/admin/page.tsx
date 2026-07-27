@@ -12,6 +12,7 @@ interface Ticket {
   ten_khach_hang: string;
   model_name: string;
   serial: string | null;
+  nguoi_dang_ky: string | null;
   trang_thai: string;
   created_at: string;
 }
@@ -108,6 +109,7 @@ export default function AdminDashboardPage() {
                 <th className="px-6 py-3">Số phiếu</th>
                 <th className="px-6 py-3">Ngày bán</th>
                 <th className="px-6 py-3">Khách hàng</th>
+                <th className="px-6 py-3">Người ĐK</th>
                 <th className="px-6 py-3">Model</th>
                 <th className="px-6 py-3">Serial</th>
                 <th className="px-6 py-3 text-right">Thao tác</th>
@@ -116,13 +118,13 @@ export default function AdminDashboardPage() {
             <tbody className="divide-y divide-slate-100 text-slate-700">
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
+                  <td colSpan={7} className="px-6 py-12 text-center text-slate-500">
                     Đang tải dữ liệu...
                   </td>
                 </tr>
               ) : tickets.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
+                  <td colSpan={7} className="px-6 py-12 text-center text-slate-500">
                     Không có dữ liệu phiếu.
                   </td>
                 </tr>
@@ -134,6 +136,7 @@ export default function AdminDashboardPage() {
                     <td className="px-6 py-4 truncate max-w-[200px]" title={t.ten_khach_hang}>
                       {t.ten_khach_hang}
                     </td>
+                    <td className="px-6 py-4 text-slate-500">{t.nguoi_dang_ky || "-"}</td>
                     <td className="px-6 py-4 font-medium">{t.model_name}</td>
                     <td className="px-6 py-4">{t.serial || "-"}</td>
                     <td className="px-6 py-4">

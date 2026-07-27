@@ -28,6 +28,7 @@ export function EditTicketModal({ ticketId, onClose, onSaved }: EditTicketModalP
 
   const [soPhieu, setSoPhieu] = useState<number | null>(null);
   const [ngayMua, setNgayMua] = useState("");
+  const [nguoiDangKy, setNguoiDangKy] = useState("");
   const [tenKhachHang, setTenKhachHang] = useState("");
   const [diaChi, setDiaChi] = useState("");
   const [selectedModel, setSelectedModel] = useState("");
@@ -51,6 +52,7 @@ export function EditTicketModal({ ticketId, onClose, onSaved }: EditTicketModalP
         if (t && !t.error) {
           setSoPhieu(t.so_phieu);
           setNgayMua((t.ngay_mua || "").slice(0, 10));
+          setNguoiDangKy(t.nguoi_dang_ky || "");
           setTenKhachHang(t.ten_khach_hang || "");
           setDiaChi(t.dia_chi || "");
           setSelectedModel(t.model_name || "");
@@ -90,6 +92,7 @@ export function EditTicketModal({ ticketId, onClose, onSaved }: EditTicketModalP
   };
 
   const handleSave = async () => {
+    if (!nguoiDangKy.trim()) return setErrorMsg("Vui lòng nhập tên người đăng ký.");
     if (!tenKhachHang.trim()) return setErrorMsg("Vui lòng điền tên khách hàng.");
     if (!diaChi.trim()) return setErrorMsg("Vui lòng điền địa chỉ.");
     if (!selectedModel) return setErrorMsg("Vui lòng chọn Model.");
@@ -103,6 +106,7 @@ export function EditTicketModal({ ticketId, onClose, onSaved }: EditTicketModalP
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ngay_mua: ngayMua,
+          nguoi_dang_ky: nguoiDangKy,
           ten_khach_hang: tenKhachHang,
           dia_chi: diaChi,
           model_name: selectedModel,
@@ -154,6 +158,18 @@ export function EditTicketModal({ ticketId, onClose, onSaved }: EditTicketModalP
                 </div>
               )}
 
+              <div>
+                <label className="mb-1 block text-sm font-medium text-slate-700">
+                  Người đăng ký <span className="text-red-500">*</span>
+                </label>
+                <input
+                  value={nguoiDangKy}
+                  onChange={(e) => setNguoiDangKy(e.target.value)}
+                  className={inputCls}
+                  placeholder="Tên nhân viên lập phiếu..."
+                />
+              </div>
+
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="mb-1 block text-sm font-medium text-slate-700">Ngày bán</label>
@@ -178,7 +194,11 @@ export function EditTicketModal({ ticketId, onClose, onSaved }: EditTicketModalP
                 <label className="mb-1 block text-sm font-medium text-slate-700">
                   Tên khách hàng <span className="text-red-500">*</span>
                 </label>
-                <input value={tenKhachHang} onChange={(e) => setTenKhachHang(e.target.value)} className={inputCls} />
+                <input
+                  value={tenKhachHang}
+                  onChange={(e) => setTenKhachHang(e.target.value.toUpperCase())}
+                  className={inputCls}
+                />
               </div>
 
               <div>
