@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, Printer, CheckCircle, Clock } from "lucide-react";
+import { Search, Printer, CheckCircle, Clock, Pencil } from "lucide-react";
+import { EditTicketModal } from "@/components/EditTicketModal";
 
 interface Ticket {
   id: number;
@@ -20,6 +21,7 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [filter, setFilter] = useState<string>("cho_in");
   const [search, setSearch] = useState<string>("");
+  const [editId, setEditId] = useState<number | null>(null);
 
   const fetchTickets = () => {
     setLoading(true);
@@ -134,24 +136,27 @@ export default function AdminDashboardPage() {
                     </td>
                     <td className="px-6 py-4 font-medium">{t.model_name}</td>
                     <td className="px-6 py-4">{t.serial || "-"}</td>
-                    <td className="px-6 py-4 text-right">
-                      {t.trang_thai === "cho_in" ? (
-                        <Link
-                          href={`/admin/print/${t.id}`}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded text-sm font-medium hover:bg-emerald-200 transition"
-                        >
-                          <Printer className="h-4 w-4" />
-                          In phôi
-                        </Link>
-                      ) : (
-                        <Link
-                          href={`/admin/print/${t.id}`}
+                    <td className="px-6 py-4">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => setEditId(t.id)}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-600 rounded text-sm font-medium hover:bg-slate-200 transition"
                         >
+                          <Pencil className="h-4 w-4" />
+                          Sửa
+                        </button>
+                        <Link
+                          href={`/admin/print/${t.id}`}
+                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-sm font-medium transition ${
+                            t.trang_thai === "cho_in"
+                              ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                          }`}
+                        >
                           <Printer className="h-4 w-4" />
-                          In lại
+                          {t.trang_thai === "cho_in" ? "In phôi" : "In lại"}
                         </Link>
-                      )}
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -160,6 +165,17 @@ export default function AdminDashboardPage() {
           </table>
         </div>
       </div>
+
+      {editId !== null && (
+        <EditTicketModal
+          ticketId={editId}
+          onClose={() => setEditId(null)}
+          onSaved={() => {
+            setEditId(null);
+            fetchTickets();
+          }}
+        />
+      )}
     </div>
   );
 }
