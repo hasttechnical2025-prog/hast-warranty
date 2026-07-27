@@ -205,8 +205,8 @@ export default function PrintTicketPage() {
           <div
             className="absolute"
             style={{
-              top: "22mm",
-              left: "14mm",
+              top: "27mm",
+              left: "10mm",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -221,8 +221,8 @@ export default function PrintTicketPage() {
           <div
             className="absolute font-bold text-slate-800"
             style={{
-              top: "16.8mm",
-              left: "186mm",
+              top: "27.9mm",
+              left: "170mm",
               fontSize: "14px",
             }}
           >
@@ -234,8 +234,8 @@ export default function PrintTicketPage() {
           <div
             className="absolute font-semibold text-slate-800 text-center"
             style={{
-              top: "23.5mm",
-              left: "155mm",
+              top: "33mm",
+              left: "163mm",
               width: "10mm",
               fontSize: "13px",
             }}
@@ -247,8 +247,8 @@ export default function PrintTicketPage() {
           <div
             className="absolute font-semibold text-slate-800 text-center"
             style={{
-              top: "23.5mm",
-              left: "172.5mm",
+              top: "33mm",
+              left: "182mm",
               width: "10mm",
               fontSize: "13px",
             }}
@@ -260,8 +260,8 @@ export default function PrintTicketPage() {
           <div
             className="absolute font-semibold text-slate-800 text-center"
             style={{
-              top: "23.5mm",
-              left: "193.5mm",
+              top: "33mm",
+              left: "195mm",
               width: "14mm",
               fontSize: "13px",
             }}
@@ -273,9 +273,9 @@ export default function PrintTicketPage() {
           <div
             className="absolute font-bold text-slate-900 overflow-hidden text-ellipsis"
             style={{
-              top: "29.2mm",
-              left: "38mm",
-              width: "158mm",
+              top: "42.9mm",
+              left: "45mm",
+              width: "150mm",
               fontSize: "13.5px",
               lineHeight: "1.2",
               whiteSpace: "nowrap",
@@ -288,9 +288,9 @@ export default function PrintTicketPage() {
           <div
             className="absolute font-semibold text-slate-800 overflow-hidden text-ellipsis"
             style={{
-              top: "35.2mm",
-              left: "22mm",
-              width: "174mm",
+              top: "48.4mm",
+              left: "24mm",
+              width: "172mm",
               fontSize: "13px",
               lineHeight: "1.2",
               whiteSpace: "nowrap",
@@ -303,8 +303,8 @@ export default function PrintTicketPage() {
           <div
             className="absolute text-slate-800"
             style={{
-              top: "41.5mm",
-              left: "48mm",
+              top: "55.2mm",
+              left: "51mm",
               fontSize: "13px",
             }}
           >
@@ -315,8 +315,8 @@ export default function PrintTicketPage() {
           <div
             className="absolute text-slate-800"
             style={{
-              top: "41.5mm",
-              left: "115mm",
+              top: "55.2mm",
+              left: "122mm",
               fontSize: "13px",
             }}
           >
@@ -327,8 +327,8 @@ export default function PrintTicketPage() {
           <div
             className="absolute font-medium text-slate-800"
             style={{
-              top: "47.5mm",
-              left: "34mm",
+              top: "61.1mm",
+              left: "41mm",
               fontSize: "13px",
             }}
           >
@@ -339,8 +339,8 @@ export default function PrintTicketPage() {
           <div
             className="absolute font-medium text-slate-800"
             style={{
-              top: "47.5mm",
-              left: "134mm",
+              top: "61.1mm",
+              left: "129mm",
               fontSize: "13px",
             }}
           >
@@ -351,7 +351,7 @@ export default function PrintTicketPage() {
           <div
             className="absolute font-bold text-slate-900"
             style={{
-              top: "53.2mm",
+              top: "67mm",
               left: "22mm",
               fontSize: "14px",
             }}
@@ -363,8 +363,8 @@ export default function PrintTicketPage() {
           <div
             className="absolute font-bold text-slate-900"
             style={{
-              top: "53.2mm",
-              left: "128mm",
+              top: "67mm",
+              left: "125mm",
               fontSize: "14px",
               letterSpacing: "0.5px",
             }}
@@ -376,8 +376,8 @@ export default function PrintTicketPage() {
           <div
             className="absolute font-medium text-slate-800"
             style={{
-              top: "59.3mm",
-              left: "40mm",
+              top: "73.6mm",
+              left: "48mm",
               fontSize: "13px",
             }}
           >
@@ -390,8 +390,8 @@ export default function PrintTicketPage() {
             <div
               className="absolute font-bold text-slate-800"
               style={{
-                top: "70.5mm",
-                left: "31.5mm",
+                top: "85.5mm",
+                left: "28mm",
                 fontSize: "14px",
               }}
             >
@@ -404,8 +404,8 @@ export default function PrintTicketPage() {
             <div
               className="absolute font-bold text-slate-800"
               style={{
-                top: "70.5mm",
-                left: "119.5mm",
+                top: "85.5mm",
+                left: "116mm",
                 fontSize: "14px",
               }}
             >
@@ -418,8 +418,8 @@ export default function PrintTicketPage() {
           <div
             className="absolute font-bold text-slate-900 text-center"
             style={{
-              top: "76.5mm",
-              left: "71mm",
+              top: "92.2mm",
+              left: "42mm",
               width: "25mm",
               fontSize: "13px",
             }}
@@ -431,8 +431,8 @@ export default function PrintTicketPage() {
           <div
             className="absolute font-bold text-slate-900 text-center"
             style={{
-              top: "76.5mm",
-              left: "112mm",
+              top: "92.2mm",
+              left: "106mm",
               width: "12mm",
               fontSize: "13px",
             }}
