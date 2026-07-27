@@ -6,6 +6,10 @@ import Link from "next/link";
 import { QRCodeSVG } from "qrcode.react";
 import { Printer, Check, ArrowLeft, Eye, EyeOff } from "lucide-react";
 
+// Ảnh phôi nền để đối chiếu vị trí trên màn hình (KHÔNG in ra).
+// Đặt file scan/crop đúng khổ A5 ngang vào public/ theo đúng tên này.
+const PHOI_TEMPLATE_SRC = "/phoi-bao-hanh.png";
+
 interface Ticket {
   id: number;
   so_phieu: number;
@@ -32,6 +36,7 @@ export default function PrintTicketPage() {
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [showBg, setShowBg] = useState<boolean>(true);
+  const [bgError, setBgError] = useState<boolean>(false);
   const [markingDone, setMarkingDone] = useState<boolean>(false);
 
   useEffect(() => {
@@ -170,15 +175,26 @@ export default function PrintTicketPage() {
             maxHeight: "148mm",
           }}
         >
-          {/* Faint Background Scanned Template for Screen Preview only (Hidden in print via global print css) */}
-          {showBg && (
-            <div
-              className="absolute inset-0 bg-contain bg-no-repeat bg-center opacity-35 pointer-events-none no-print"
-              style={{
-                backgroundImage: "url('/logo.png')", // We can put a scanned template placeholder or mock logo here
-                backgroundSize: "100% 100%",
-              }}
+          {/* Ảnh phôi nền: chỉ hiển thị trên màn hình để canh khớp, KHÔNG in ra (no-print) */}
+          {showBg && !bgError && (
+            <img
+              src={PHOI_TEMPLATE_SRC}
+              alt=""
+              onError={() => setBgError(true)}
+              className="absolute inset-0 h-full w-full opacity-45 pointer-events-none select-none no-print"
+              style={{ objectFit: "fill" }}
             />
+          )}
+
+          {/* Chưa có ảnh phôi -> hướng dẫn thay vì im lặng */}
+          {showBg && bgError && (
+            <div className="absolute inset-0 flex items-center justify-center p-6 pointer-events-none no-print">
+              <div className="max-w-xs rounded-lg border border-dashed border-slate-300 bg-white/80 px-4 py-3 text-center text-[11px] leading-relaxed text-slate-500">
+                Chưa có ảnh phôi nền. Hãy quét/chụp mẫu phôi A5, lưu vào{" "}
+                <span className="font-mono font-semibold text-slate-700">public/phoi-bao-hanh.png</span>{" "}
+                rồi tải lại trang để đối chiếu vị trí các trường.
+              </div>
+            </div>
           )}
 
           {/* ========================================================================= */}
