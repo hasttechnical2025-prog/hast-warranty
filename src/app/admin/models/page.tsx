@@ -309,7 +309,9 @@ export default function ManageModelsPage() {
                     <tr key={m.id} className="hover:bg-slate-50 transition">
                       <td className="px-6 py-4 font-bold text-slate-900">{m.model_name}</td>
                       <td className="px-6 py-4">{m.hang_sx}</td>
-                      <td className="px-6 py-4">{m.so_ban_chup_mac_dinh.toLocaleString("vi-VN")}</td>
+                      <td className="px-6 py-4">
+                        {m.so_ban_chup_mac_dinh > 0 ? m.so_ban_chup_mac_dinh.toLocaleString("vi-VN") : "—"}
+                      </td>
                       <td className="px-6 py-4">{m.so_thang_mac_dinh} tháng</td>
                       <td className="px-6 py-4 text-right flex justify-end gap-2">
                         <button

@@ -206,7 +206,7 @@ export function ImportModelsModal({ onClose, onImported }: Props) {
                           <td className="px-3 py-1.5">{m.loai_san_pham || "—"}</td>
                           <td className="px-3 py-1.5">{m.cau_hinh || "—"}</td>
                           <td className="px-3 py-1.5">
-                            {(m.so_ban_chup_mac_dinh || 100000).toLocaleString("vi-VN")}
+                            {m.so_ban_chup_mac_dinh > 0 ? m.so_ban_chup_mac_dinh.toLocaleString("vi-VN") : "—"}
                           </td>
                           <td className="px-3 py-1.5">{m.so_thang_mac_dinh || 12}</td>
                         </tr>

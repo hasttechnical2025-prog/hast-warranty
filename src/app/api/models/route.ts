@@ -42,8 +42,9 @@ export async function POST(request: NextRequest) {
       loai_san_pham: loai_san_pham?.trim() || "Máy photocopy",
       hang_sx: hang_sx.trim(),
       cau_hinh: cau_hinh?.trim() || "Copy-In-Quét",
-      so_ban_chup_mac_dinh: Number(so_ban_chup_mac_dinh) || 100000,
-      so_thang_mac_dinh: Number(so_thang_mac_dinh) || 12,
+      // Trống/0 = không bảo hành theo bản chụp (KHÔNG tự điền 100.000)
+      so_ban_chup_mac_dinh: Number(so_ban_chup_mac_dinh) > 0 ? Math.floor(Number(so_ban_chup_mac_dinh)) : 0,
+      so_thang_mac_dinh: Number(so_thang_mac_dinh) > 0 ? Math.floor(Number(so_thang_mac_dinh)) : 12,
     };
 
     if (id) {

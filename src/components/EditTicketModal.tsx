@@ -61,8 +61,8 @@ export function EditTicketModal({ ticketId, onClose, onSaved }: EditTicketModalP
           setCauHinh(t.cau_hinh || "");
           setSerial(t.serial || "");
           setDiaDiemBaoHanh(t.dia_diem_bao_hanh || "Tại khách hàng");
-          setSoBanChup(String(t.so_ban_chup ?? ""));
-          setSoThang(String(t.so_thang ?? ""));
+          setSoBanChup(t.so_ban_chup > 0 ? String(t.so_ban_chup) : "");
+          setSoThang(t.so_thang > 0 ? String(t.so_thang) : "");
         } else {
           setErrorMsg("Không tải được dữ liệu phiếu.");
         }
@@ -86,8 +86,8 @@ export function EditTicketModal({ ticketId, onClose, onSaved }: EditTicketModalP
       setHangSx(m.hang_sx);
       setCauHinh(m.cau_hinh);
       // Chỉ gợi ý lại hạn mức nếu đang trống (tránh ghi đè số đã nhập)
-      setSoBanChup((prev) => (prev ? prev : String(m.so_ban_chup_mac_dinh)));
-      setSoThang((prev) => (prev ? prev : String(m.so_thang_mac_dinh)));
+      setSoBanChup((prev) => (prev ? prev : m.so_ban_chup_mac_dinh > 0 ? String(m.so_ban_chup_mac_dinh) : ""));
+      setSoThang((prev) => (prev ? prev : m.so_thang_mac_dinh > 0 ? String(m.so_thang_mac_dinh) : ""));
     }
   };
 
@@ -96,7 +96,8 @@ export function EditTicketModal({ ticketId, onClose, onSaved }: EditTicketModalP
     if (!tenKhachHang.trim()) return setErrorMsg("Vui lòng điền tên khách hàng.");
     if (!diaChi.trim()) return setErrorMsg("Vui lòng điền địa chỉ.");
     if (!selectedModel) return setErrorMsg("Vui lòng chọn Model.");
-    if (!soBanChup || !soThang) return setErrorMsg("Vui lòng điền đầy đủ chế độ bảo hành.");
+    if ((Number(soBanChup) || 0) <= 0 && (Number(soThang) || 0) <= 0)
+      return setErrorMsg("Cần ít nhất một chế độ bảo hành: theo bản chụp hoặc theo tháng.");
 
     setSaving(true);
     setErrorMsg("");
@@ -260,20 +261,17 @@ export function EditTicketModal({ ticketId, onClose, onSaved }: EditTicketModalP
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">
-                    Hạn mức bản chụp <span className="text-red-500">*</span>
-                  </label>
+                  <label className="mb-1 block text-sm font-medium text-slate-700">Hạn mức bản chụp</label>
                   <input
                     type="number"
                     value={soBanChup}
                     onChange={(e) => setSoBanChup(e.target.value)}
                     className={inputCls}
+                    placeholder="Để trống nếu không có"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-slate-700">
-                    Thời hạn (tháng) <span className="text-red-500">*</span>
-                  </label>
+                  <label className="mb-1 block text-sm font-medium text-slate-700">Thời hạn (tháng)</label>
                   <input
                     type="number"
                     value={soThang}

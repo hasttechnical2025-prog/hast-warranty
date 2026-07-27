@@ -147,8 +147,9 @@ export default function RegisterWarrantyPage() {
       setLoaiSanPham(model.loai_san_pham);
       setHangSx(model.hang_sx);
       setCauHinh(model.cau_hinh);
-      setSoBanChup(String(model.so_ban_chup_mac_dinh));
-      setSoThang(String(model.so_thang_mac_dinh));
+      // 0 = không có chế độ đó -> để trống ô cho gọn
+      setSoBanChup(model.so_ban_chup_mac_dinh > 0 ? String(model.so_ban_chup_mac_dinh) : "");
+      setSoThang(model.so_thang_mac_dinh > 0 ? String(model.so_thang_mac_dinh) : "");
     } else {
       setLoaiSanPham("");
       setHangSx("");
@@ -222,8 +223,8 @@ export default function RegisterWarrantyPage() {
       setErrorMsg("Vui lòng chọn Model máy.");
       return;
     }
-    if (!soBanChup || !soThang) {
-      setErrorMsg("Vui lòng điền đầy đủ chế độ bảo hành.");
+    if ((Number(soBanChup) || 0) <= 0 && (Number(soThang) || 0) <= 0) {
+      setErrorMsg("Cần ít nhất một chế độ bảo hành: theo bản chụp hoặc theo tháng.");
       return;
     }
 
@@ -572,16 +573,15 @@ export default function RegisterWarrantyPage() {
                   {/* Số bản chụp */}
                   <div>
                     <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                      Hạn mức bản chụp <span className="text-red-500">*</span>
+                      Hạn mức bản chụp
                     </label>
                     <div className="relative">
                       <input
                         type="number"
                         value={soBanChup}
                         onChange={(e) => setSoBanChup(e.target.value)}
-                        placeholder="Ví dụ: 100000"
+                        placeholder="Để trống nếu không có"
                         className={`${inputBase} pr-12`}
-                        required
                       />
                       <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-sm text-slate-400">
                         bản
@@ -679,8 +679,7 @@ export default function RegisterWarrantyPage() {
                   !tenKhachHang.trim() ||
                   !diaChi.trim() ||
                   !selectedModel ||
-                  !soBanChup.trim() ||
-                  !soThang.trim()
+                  ((Number(soBanChup) || 0) <= 0 && (Number(soThang) || 0) <= 0)
                 }
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 py-3.5 font-bold text-white shadow-sm shadow-emerald-500/20 transition hover:from-emerald-700 hover:to-teal-700 active:from-emerald-800 active:to-teal-800 disabled:from-slate-200 disabled:to-slate-200 disabled:text-slate-400 disabled:shadow-none"
               >

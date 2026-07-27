@@ -153,9 +153,10 @@ export function fieldContent(key: FieldKey, t: TicketLike): string {
     case "diadiem_kh":
       return t.dia_diem_bao_hanh === "Tại khách hàng" ? "✓" : "";
     case "che_do_ban":
-      return Number(t.so_ban_chup || 0).toLocaleString("vi-VN");
+      // 0 = không bảo hành theo bản chụp -> để trống trên phôi
+      return Number(t.so_ban_chup) > 0 ? Number(t.so_ban_chup).toLocaleString("vi-VN") : "";
     case "che_do_thang":
-      return String(t.so_thang ?? "");
+      return Number(t.so_thang) > 0 ? String(t.so_thang) : "";
     case "qr":
       return "";
   }
