@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Award, ShieldAlert, List, Settings, LogOut } from "lucide-react";
+import { Award, ShieldAlert, List, Settings, LogOut, Crop } from "lucide-react";
 
 export function Header() {
   const pathname = usePathname();
@@ -39,6 +39,7 @@ export function Header() {
   const isHome = pathname === "/";
   const isDuyetIn = pathname === "/admin" || pathname.startsWith("/admin/print");
   const isCauHinh = pathname === "/admin/models";
+  const isCanPhoi = pathname === "/admin/can-phoi";
 
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm no-print">
@@ -91,6 +92,18 @@ export function Header() {
                 >
                   <Settings className="h-4 w-4" />
                   <span>Cấu hình model</span>
+                </Link>
+
+                <Link
+                  href="/admin/can-phoi"
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isCanPhoi
+                      ? "bg-emerald-50 text-emerald-700"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                  }`}
+                >
+                  <Crop className="h-4 w-4" />
+                  <span>Căn phôi</span>
                 </Link>
 
                 <button
