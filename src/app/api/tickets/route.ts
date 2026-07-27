@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { removeVietnameseTones } from '@/lib/tiengViet';
 import { sendTelegramMessage } from '@/lib/telegram';
-import { isAdminAuthenticated } from '@/lib/auth';
+import { requireRole } from '@/lib/session';
 
 // Helper to generate a random search code for QR
 function generateSearchCode(): string {
@@ -16,8 +16,8 @@ function generateSearchCode(): string {
 
 export async function GET(request: NextRequest) {
   try {
-    // Danh sách phiếu chứa thông tin khách hàng → chỉ admin được liệt kê.
-    if (!(await isAdminAuthenticated())) {
+    // Danh sách phiếu → manager/admin.
+    if (!(await requireRole("manager", "admin"))) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -57,6 +57,13 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Đăng ký phiếu: phải đăng nhập (guest/manager/admin). Người đăng ký lấy từ phiên
+    // (không tin giá trị client gửi lên) để đảm bảo truy vết đúng người.
+    const session = await requireRole("guest", "manager", "admin");
+    if (!session) {
+      return NextResponse.json({ error: "Vui lòng đăng nhập để đăng ký phiếu" }, { status: 401 });
+    }
+
     const body = await request.json();
     const {
       ngay_mua,
@@ -70,15 +77,14 @@ export async function POST(request: NextRequest) {
       dia_diem_bao_hanh,
       so_ban_chup,
       so_thang,
-      nguoi_dang_ky,
       khach_hang_id, // can be passed if selected from lookup
     } = body;
 
+    // Người đăng ký = tên tài khoản đang đăng nhập (truy vết chính xác)
+    const nguoi_dang_ky = session.full_name;
+
     if (!ten_khach_hang || !dia_chi || !model_name) {
       return NextResponse.json({ error: "Thiếu thông tin bắt buộc (Khách hàng, Địa chỉ, Model)" }, { status: 400 });
-    }
-    if (!nguoi_dang_ky || !String(nguoi_dang_ky).trim()) {
-      return NextResponse.json({ error: "Vui lòng nhập tên người đăng ký" }, { status: 400 });
     }
 
     // Clean serial: keep only uppercase alpha-numeric characters (or leave empty)

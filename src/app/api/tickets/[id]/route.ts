@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { sendTelegramMessage } from '@/lib/telegram';
-import { isAdminAuthenticated } from '@/lib/auth';
+import { requireRole } from '@/lib/session';
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    if (!(await isAdminAuthenticated())) {
+    const session = await requireRole("manager", "admin");
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -65,6 +66,12 @@ export async function PUT(
       return NextResponse.json({ error: "Không có gì để cập nhật" }, { status: 400 });
     }
 
+    // Sửa NỘI DUNG phiếu (khác trạng thái) chỉ dành cho admin; manager chỉ đổi trạng thái.
+    const hasContentChange = Object.keys(update).some((k) => k !== "trang_thai");
+    if (hasContentChange && session.role !== "admin") {
+      return NextResponse.json({ error: "Chỉ admin được sửa nội dung phiếu" }, { status: 403 });
+    }
+
     let { error: updateErr } = await supabaseAdmin
       .from('pbh_phieu_bao_hanh')
       .update(update)
@@ -110,8 +117,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Bản ghi đầy đủ (địa chỉ, mã tra cứu...) → chỉ admin. Khách tra cứu qua /api/lookup.
-    if (!(await isAdminAuthenticated())) {
+    // Bản ghi đầy đủ (địa chỉ, mã tra cứu...) → manager/admin. Khách tra cứu qua /api/lookup.
+    if (!(await requireRole("manager", "admin"))) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

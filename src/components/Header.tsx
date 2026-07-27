@@ -3,13 +3,16 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Award, ShieldAlert, List, Settings, LogOut, Crop, SlidersHorizontal } from "lucide-react";
+import { Award, ShieldAlert, List, Settings, LogOut, Crop, SlidersHorizontal, Users } from "lucide-react";
 import { DEFAULT_SETTINGS, type AppSettings } from "@/lib/settings";
+
+type Role = "guest" | "manager" | "admin" | null;
 
 export function Header() {
   const pathname = usePathname();
   const router = useRouter();
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [role, setRole] = useState<Role>(null);
+  const [fullName, setFullName] = useState<string>("");
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
 
   useEffect(() => {
@@ -21,25 +24,21 @@ export function Header() {
       .catch(() => {});
   }, [pathname]);
 
-  const checkAuth = async () => {
-    try {
-      const res = await fetch("/api/admin/me");
-      const data = await res.json();
-      setIsAdmin(!!data.isAdmin);
-    } catch (e) {
-      setIsAdmin(false);
-    }
-  };
-
   useEffect(() => {
-    checkAuth();
+    fetch("/api/admin/me")
+      .then((r) => r.json())
+      .then((d) => {
+        setRole(d.authenticated ? d.role : null);
+        setFullName(d.full_name || "");
+      })
+      .catch(() => setRole(null));
   }, [pathname]);
 
   const handleLogout = async () => {
     try {
       const res = await fetch("/api/admin/logout", { method: "POST" });
       if (res.ok) {
-        setIsAdmin(false);
+        setRole(null);
         router.push("/admin/login");
       }
     } catch (e) {
@@ -47,11 +46,13 @@ export function Header() {
     }
   };
 
-  const isHome = pathname === "/";
-  const isDuyetIn = pathname === "/admin" || pathname.startsWith("/admin/print");
-  const isCauHinh = pathname === "/admin/models";
-  const isCanPhoi = pathname === "/admin/can-phoi";
-  const isCaiDat = pathname === "/admin/cai-dat";
+  const isManagerUp = role === "manager" || role === "admin";
+  const isAdmin = role === "admin";
+
+  const navCls = (active: boolean) =>
+    `flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+      active ? "bg-emerald-50 text-emerald-700" : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+    }`;
 
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm no-print">
@@ -59,11 +60,7 @@ export function Header() {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-2">
             {settings.logo_data_url ? (
-              <img
-                src={settings.logo_data_url}
-                alt="logo"
-                className="h-9 w-9 rounded-lg object-contain"
-              />
+              <img src={settings.logo_data_url} alt="logo" className="h-9 w-9 rounded-lg object-contain" />
             ) : (
               <div className="bg-emerald-600 p-2 rounded-lg text-white">
                 <Award className="h-5 w-5" />
@@ -75,77 +72,54 @@ export function Header() {
             </div>
           </div>
 
-          <nav className="flex items-center gap-1 sm:gap-3">
-            <Link
-              href="/"
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                isHome
-                  ? "bg-emerald-50 text-emerald-700"
-                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-              }`}
-            >
-              <ShieldAlert className="h-4 w-4" />
-              <span>Đăng ký bảo hành</span>
-            </Link>
+          <nav className="flex items-center gap-1 sm:gap-2">
+            {role && (
+              <Link href="/" className={navCls(pathname === "/")}>
+                <ShieldAlert className="h-4 w-4" />
+                <span className="hidden sm:inline">Đăng ký</span>
+              </Link>
+            )}
+
+            {isManagerUp && (
+              <Link
+                href="/admin"
+                className={navCls(pathname === "/admin" || pathname.startsWith("/admin/print"))}
+              >
+                <List className="h-4 w-4" />
+                <span className="hidden sm:inline">Duyệt &amp; In</span>
+              </Link>
+            )}
 
             {isAdmin && (
               <>
-                <Link
-                  href="/admin"
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isDuyetIn
-                      ? "bg-emerald-50 text-emerald-700"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                  }`}
-                >
-                  <List className="h-4 w-4" />
-                  <span>Duyệt & In phiếu</span>
-                </Link>
-
-                <Link
-                  href="/admin/models"
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isCauHinh
-                      ? "bg-emerald-50 text-emerald-700"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                  }`}
-                >
+                <Link href="/admin/models" className={navCls(pathname === "/admin/models")}>
                   <Settings className="h-4 w-4" />
-                  <span>Cấu hình model</span>
+                  <span className="hidden md:inline">Model</span>
                 </Link>
-
-                <Link
-                  href="/admin/can-phoi"
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isCanPhoi
-                      ? "bg-emerald-50 text-emerald-700"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                  }`}
-                >
+                <Link href="/admin/can-phoi" className={navCls(pathname === "/admin/can-phoi")}>
                   <Crop className="h-4 w-4" />
-                  <span>Căn phôi</span>
+                  <span className="hidden md:inline">Căn phôi</span>
                 </Link>
-
-                <Link
-                  href="/admin/cai-dat"
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isCaiDat
-                      ? "bg-emerald-50 text-emerald-700"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                  }`}
-                >
+                <Link href="/admin/cai-dat" className={navCls(pathname === "/admin/cai-dat")}>
                   <SlidersHorizontal className="h-4 w-4" />
-                  <span>Cài đặt</span>
+                  <span className="hidden md:inline">Cài đặt</span>
                 </Link>
-
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors cursor-pointer"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span className="hidden sm:inline">Đăng xuất</span>
-                </button>
+                <Link href="/admin/nguoi-dung" className={navCls(pathname === "/admin/nguoi-dung")}>
+                  <Users className="h-4 w-4" />
+                  <span className="hidden md:inline">Người dùng</span>
+                </Link>
               </>
+            )}
+
+            {role && (
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors cursor-pointer"
+                title={fullName ? `Đăng xuất (${fullName})` : "Đăng xuất"}
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="hidden sm:inline">Đăng xuất</span>
+              </button>
             )}
           </nav>
         </div>

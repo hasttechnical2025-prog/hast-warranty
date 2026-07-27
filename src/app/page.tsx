@@ -91,6 +91,16 @@ export default function RegisterWarrantyPage() {
       .catch(() => {});
   }, []);
 
+  // Người đăng ký = tài khoản đang đăng nhập (không cho gõ tay)
+  useEffect(() => {
+    fetch("/api/admin/me")
+      .then((res) => res.json())
+      .then((d) => {
+        if (d.authenticated && d.full_name) setNguoiDangKy(d.full_name);
+      })
+      .catch(() => {});
+  }, []);
+
   // Fetch default models
   useEffect(() => {
     fetch("/api/models")
@@ -181,7 +191,7 @@ export default function RegisterWarrantyPage() {
   };
 
   const resetForm = () => {
-    setNguoiDangKy("");
+    // giữ nguyên nguoiDangKy (theo tài khoản đăng nhập)
     setTenKhachHang("");
     setKhachHangId(null);
     setDiaChi("");
@@ -393,10 +403,10 @@ export default function RegisterWarrantyPage() {
                     <input
                       type="text"
                       value={nguoiDangKy}
-                      onChange={(e) => setNguoiDangKy(e.target.value)}
-                      placeholder="Tên nhân viên lập phiếu..."
-                      className={`${inputBase} pl-10`}
-                      required
+                      readOnly
+                      placeholder="Theo tài khoản đăng nhập"
+                      className={`${inputBase} pl-10 bg-slate-50 text-slate-600 cursor-not-allowed`}
+                      title="Tự động theo tài khoản đăng nhập"
                     />
                   </div>
                 </div>
