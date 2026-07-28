@@ -161,7 +161,8 @@ export async function POST(request: NextRequest) {
       so_thang: Number(so_thang),
       nguoi_dang_ky: String(nguoi_dang_ky).trim(),
       ma_tra_cuu: lookupCode,
-      trang_thai: 'cho_in'
+      // Guest đăng ký -> CHỜ DUYỆT; manager/admin tự tạo -> vào thẳng CHỜ IN
+      trang_thai: session.role === 'guest' ? 'cho_duyet' : 'cho_in',
     };
 
     if (ngay_mua) {
@@ -191,7 +192,8 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. Send Telegram Notification
-    const tgMessage = `📝 <b>YÊU CẦU CẤP PHIẾU BẢO HÀNH MỚI</b>\n` +
+    const choDuyet = ticketData.trang_thai === 'cho_duyet';
+    const tgMessage = `${choDuyet ? '🕵️ <b>YÊU CẦU CẤP PHIẾU — CHỜ DUYỆT</b>' : '📝 <b>PHIẾU BẢO HÀNH MỚI (chờ in)</b>'}\n` +
       `-----------------------------------------\n` +
       `• <b>Số phiếu:</b> #${newTicket.so_phieu}\n` +
       `• <b>Người đăng ký:</b> ${String(nguoi_dang_ky).trim()}\n` +
@@ -200,7 +202,7 @@ export async function POST(request: NextRequest) {
       `• <b>Model:</b> ${model_name} ${cleanedSerial ? `(S/N: ${cleanedSerial})` : '(Chưa có Serial)'}\n` +
       `• <b>Bảo hành:</b> ${Number(so_ban_chup).toLocaleString('vi-VN')} bản / ${so_thang} tháng\n` +
       `• <b>Địa điểm:</b> ${dia_diem_bao_hanh}\n\n` +
-      `🔗 <i>Xem và in phiếu tại dashboard admin</i>`;
+      `${choDuyet ? '⏳ <i>Cần duyệt trong mục Duyệt &amp; In trước khi in.</i>' : '🔗 <i>Xem và in phiếu tại Duyệt &amp; In.</i>'}`;
 
     await sendTelegramMessage(tgMessage);
 

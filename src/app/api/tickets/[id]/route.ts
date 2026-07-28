@@ -49,10 +49,12 @@ export async function PUT(
     // Trạng thái (tùy chọn); nếu có phải hợp lệ.
     const trang_thai = body.trang_thai;
     if (trang_thai !== undefined) {
-      if (!['cho_in', 'da_in', 'huy'].includes(trang_thai)) {
+      if (!['cho_duyet', 'cho_in', 'da_in', 'huy'].includes(trang_thai)) {
         return NextResponse.json({ error: "Trạng thái không hợp lệ" }, { status: 400 });
       }
       update.trang_thai = trang_thai;
+      // Đóng dấu "người in" khi chuyển sang đã in
+      if (trang_thai === 'da_in') update.nguoi_in = session.full_name;
     }
 
     // Chặn cập nhật rỗng các trường bắt buộc
@@ -66,8 +68,9 @@ export async function PUT(
       return NextResponse.json({ error: "Không có gì để cập nhật" }, { status: 400 });
     }
 
-    // Sửa NỘI DUNG phiếu (khác trạng thái) chỉ dành cho admin; manager chỉ đổi trạng thái.
-    const hasContentChange = Object.keys(update).some((k) => k !== "trang_thai");
+    // Sửa NỘI DUNG phiếu (khác trạng thái/người in tự đóng dấu) chỉ dành cho admin;
+    // manager chỉ được đổi trạng thái (duyệt / đã in / huỷ).
+    const hasContentChange = Object.keys(update).some((k) => k !== "trang_thai" && k !== "nguoi_in");
     if (hasContentChange && session.role !== "admin") {
       return NextResponse.json({ error: "Chỉ admin được sửa nội dung phiếu" }, { status: 403 });
     }
@@ -77,9 +80,9 @@ export async function PUT(
       .update(update)
       .eq('id', id);
 
-    // Phòng thủ: cột nguoi_dang_ky chưa migrate -> cập nhật các trường còn lại
-    if (updateErr && /nguoi_dang_ky/.test(updateErr.message || "")) {
-      const { nguoi_dang_ky: _omit, ...rest } = update;
+    // Phòng thủ: cột nguoi_dang_ky / nguoi_in chưa migrate -> cập nhật các trường còn lại
+    if (updateErr && /(nguoi_dang_ky|nguoi_in)/.test(updateErr.message || "")) {
+      const { nguoi_dang_ky: _o1, nguoi_in: _o2, ...rest } = update;
       if (Object.keys(rest).length > 0) {
         ({ error: updateErr } = await supabaseAdmin
           .from('pbh_phieu_bao_hanh')
