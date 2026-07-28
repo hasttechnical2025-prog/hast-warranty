@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { UserPlus, Trash2, Edit2, X, Copy, QrCode, RefreshCw, ShieldCheck, Power } from "lucide-react";
+import { AdminSettingsTabs } from "@/components/AdminSettingsTabs";
 
 interface User {
   id: number;
@@ -136,7 +137,9 @@ export default function NguoiDungPage() {
   const guestLink = (u: User | null) => (u?.login_token ? `${origin}/vao/${u.login_token}` : "");
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 w-full flex-1 grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div className="flex-1 flex flex-col">
+      <AdminSettingsTabs />
+      <div className="max-w-7xl mx-auto px-4 py-8 w-full grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* Form */}
       <div className="lg:col-span-1">
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
@@ -316,6 +319,7 @@ export default function NguoiDungPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

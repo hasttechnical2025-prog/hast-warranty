@@ -3,10 +3,13 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Award, ShieldAlert, List, Settings, LogOut, Crop, SlidersHorizontal, Users } from "lucide-react";
+import { Award, ShieldAlert, List, LogOut, SlidersHorizontal } from "lucide-react";
 import { DEFAULT_SETTINGS, type AppSettings } from "@/lib/settings";
 
 type Role = "guest" | "manager" | "admin" | null;
+
+// Các route thuộc khu "Cài đặt" (tab con nằm trong AdminSettingsTabs)
+const SETTINGS_ROUTES = ["/admin/cai-dat", "/admin/models", "/admin/can-phoi", "/admin/nguoi-dung"];
 
 export function Header() {
   const pathname = usePathname();
@@ -91,24 +94,10 @@ export function Header() {
             )}
 
             {isAdmin && (
-              <>
-                <Link href="/admin/models" className={navCls(pathname === "/admin/models")}>
-                  <Settings className="h-4 w-4" />
-                  <span className="hidden md:inline">Model</span>
-                </Link>
-                <Link href="/admin/can-phoi" className={navCls(pathname === "/admin/can-phoi")}>
-                  <Crop className="h-4 w-4" />
-                  <span className="hidden md:inline">Căn phôi</span>
-                </Link>
-                <Link href="/admin/cai-dat" className={navCls(pathname === "/admin/cai-dat")}>
-                  <SlidersHorizontal className="h-4 w-4" />
-                  <span className="hidden md:inline">Cài đặt</span>
-                </Link>
-                <Link href="/admin/nguoi-dung" className={navCls(pathname === "/admin/nguoi-dung")}>
-                  <Users className="h-4 w-4" />
-                  <span className="hidden md:inline">Người dùng</span>
-                </Link>
-              </>
+              <Link href="/admin/cai-dat" className={navCls(SETTINGS_ROUTES.some((r) => pathname.startsWith(r)))}>
+                <SlidersHorizontal className="h-4 w-4" />
+                <span className="hidden sm:inline">Cài đặt</span>
+              </Link>
             )}
 
             {role && (

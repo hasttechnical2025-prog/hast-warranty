@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { DEFAULT_SETTINGS, type AppSettings } from "@/lib/settings";
+import { AdminSettingsTabs } from "@/components/AdminSettingsTabs";
 import { Save, Upload, Trash2, Plus, X, Hash, AlertTriangle } from "lucide-react";
 
 export default function CaiDatPage() {
@@ -113,6 +114,7 @@ export default function CaiDatPage() {
 
   return (
     <div className="flex-1 bg-slate-100">
+      <AdminSettingsTabs />
       <div className="mx-auto max-w-3xl px-4 py-8">
         <h1 className="text-2xl font-bold text-slate-800">Cài đặt hệ thống</h1>
         <p className="mb-6 mt-1 text-sm text-slate-500">

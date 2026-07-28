@@ -8,6 +8,7 @@ import {
   type TemplateProfile,
   type TicketLike,
 } from "@/lib/print-template";
+import { AdminSettingsTabs } from "@/components/AdminSettingsTabs";
 import { Save, Copy, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Eye, EyeOff } from "lucide-react";
 
 const SAMPLE: TicketLike = {
@@ -103,6 +104,7 @@ export default function CanPhoiPage() {
 
   return (
     <div className="flex-1 bg-slate-100">
+      <AdminSettingsTabs />
       <div className="mx-auto max-w-[1200px] px-4 py-6">
         <div className="mb-4 flex items-center justify-between">
           <div>
