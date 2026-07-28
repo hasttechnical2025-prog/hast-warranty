@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { Plus, Trash2, Edit2, FileSpreadsheet, Search } from "lucide-react";
+import { Plus, Trash2, Edit2, FileSpreadsheet, Search, AlertTriangle } from "lucide-react";
 import { ImportModelsModal } from "@/components/ImportModelsModal";
 import { ModelFormModal, type Model } from "@/components/ModelFormModal";
 import { AdminSettingsTabs } from "@/components/AdminSettingsTabs";
@@ -11,6 +11,7 @@ export default function ManageModelsPage() {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
   const [search, setSearch] = useState("");
+  const [onlyDraft, setOnlyDraft] = useState(false);
   const [showImport, setShowImport] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingModel, setEditingModel] = useState<Model | null>(null);
@@ -30,13 +31,15 @@ export default function ManageModelsPage() {
     fetchModels();
   }, []);
 
+  const draftCount = useMemo(() => models.filter((m) => m.is_draft).length, [models]);
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return models;
-    return models.filter(
-      (m) => m.model_name.toLowerCase().includes(q) || m.hang_sx.toLowerCase().includes(q)
-    );
-  }, [models, search]);
+    let list = models;
+    if (onlyDraft) list = list.filter((m) => m.is_draft);
+    if (q) list = list.filter((m) => m.model_name.toLowerCase().includes(q) || m.hang_sx.toLowerCase().includes(q));
+    return list;
+  }, [models, search, onlyDraft]);
 
   const openAdd = () => {
     setEditingModel(null);
@@ -95,9 +98,9 @@ export default function ManageModelsPage() {
         )}
 
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex-1 flex flex-col">
-          {/* Thanh tìm kiếm */}
-          <div className="p-3 border-b border-slate-100 bg-slate-50">
-            <div className="relative max-w-sm">
+          {/* Thanh tìm kiếm + lọc nháp */}
+          <div className="p-3 border-b border-slate-100 bg-slate-50 flex flex-wrap items-center gap-3">
+            <div className="relative flex-1 min-w-[200px] max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <input
                 value={search}
@@ -106,6 +109,20 @@ export default function ManageModelsPage() {
                 className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-md bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
+            {draftCount > 0 && (
+              <button
+                onClick={() => setOnlyDraft((v) => !v)}
+                className={`inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition ${
+                  onlyDraft
+                    ? "bg-amber-500 text-white"
+                    : "bg-amber-100 text-amber-700 hover:bg-amber-200"
+                }`}
+                title="Model do nhân viên tạo, cần admin chuẩn hoá"
+              >
+                <AlertTriangle className="h-4 w-4" />
+                {onlyDraft ? "Đang xem model nháp" : `Model nháp cần chuẩn hoá (${draftCount})`}
+              </button>
+            )}
           </div>
 
           <div className="overflow-x-auto flex-1">
@@ -132,8 +149,17 @@ export default function ManageModelsPage() {
                   </tr>
                 ) : (
                   filtered.map((m) => (
-                    <tr key={m.id} className="hover:bg-slate-50 transition">
-                      <td className="px-6 py-4 font-bold text-slate-900">{m.model_name}</td>
+                    <tr key={m.id} className={`hover:bg-slate-50 transition ${m.is_draft ? "bg-amber-50/50" : ""}`}>
+                      <td className="px-6 py-4 font-bold text-slate-900">
+                        <span className="inline-flex items-center gap-2">
+                          {m.model_name}
+                          {m.is_draft && (
+                            <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">
+                              NHÁP
+                            </span>
+                          )}
+                        </span>
+                      </td>
                       <td className="px-6 py-4">{m.hang_sx}</td>
                       <td className="px-6 py-4">
                         {m.so_ban_chup_mac_dinh > 0 ? m.so_ban_chup_mac_dinh.toLocaleString("vi-VN") : "—"}

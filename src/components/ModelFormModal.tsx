@@ -11,6 +11,7 @@ export interface Model {
   cau_hinh: string;
   so_ban_chup_mac_dinh: number;
   so_thang_mac_dinh: number;
+  is_draft?: boolean;
 }
 
 interface Props {
@@ -77,6 +78,11 @@ export function ModelFormModal({ model, onClose, onSaved }: Props) {
         </div>
 
         <div className="space-y-4 p-5">
+          {model?.is_draft && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm text-amber-700">
+              Model này do nhân viên tạo khi đăng ký, <b>chưa chuẩn hoá</b>. Kiểm tra thông tin rồi bấm Lưu để xác nhận chuẩn.
+            </div>
+          )}
           {err && <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">{err}</div>}
 
           <div className="grid gap-4 sm:grid-cols-2">

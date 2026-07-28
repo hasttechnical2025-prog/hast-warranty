@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SlidersHorizontal, Cpu, Crop, Users } from "lucide-react";
@@ -15,6 +15,16 @@ const TABS = [
 
 export function AdminSettingsTabs() {
   const pathname = usePathname();
+  const [draftCount, setDraftCount] = useState(0);
+
+  useEffect(() => {
+    fetch("/api/models")
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d)) setDraftCount(d.filter((m: any) => m.is_draft).length);
+      })
+      .catch(() => {});
+  }, [pathname]);
   return (
     <div className="border-b border-slate-200 bg-white no-print">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -33,6 +43,11 @@ export function AdminSettingsTabs() {
               >
                 <Icon className="h-4 w-4" />
                 {label}
+                {href === "/admin/models" && draftCount > 0 && (
+                  <span className="ml-1 rounded-full bg-amber-500 px-1.5 text-[10px] font-bold text-white">
+                    {draftCount}
+                  </span>
+                )}
               </Link>
             );
           })}

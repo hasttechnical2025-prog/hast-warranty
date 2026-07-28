@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
         // Trống = 0 = không bảo hành theo bản chụp (giữ đúng dữ liệu nguồn, không tự điền 100.000)
         so_ban_chup_mac_dinh: Number(r?.so_ban_chup_mac_dinh) > 0 ? Math.floor(Number(r.so_ban_chup_mac_dinh)) : 0,
         so_thang_mac_dinh: Number(r?.so_thang_mac_dinh) > 0 ? Math.floor(Number(r.so_thang_mac_dinh)) : 12,
+        is_draft: false, // nhập từ Excel = admin -> chuẩn
       });
     }
 
@@ -61,7 +62,12 @@ export async function POST(request: NextRequest) {
 
     let added = 0;
     if (toInsert.length > 0) {
-      const { data, error } = await supabaseAdmin.from("pbh_models").insert(toInsert).select("id");
+      let { data, error } = await supabaseAdmin.from("pbh_models").insert(toInsert).select("id");
+      // Phòng thủ: cột is_draft chưa migrate -> nhập lại không kèm cột đó
+      if (error && /is_draft/.test(error.message || "")) {
+        const noDraft = toInsert.map(({ is_draft, ...m }) => m);
+        ({ data, error } = await supabaseAdmin.from("pbh_models").insert(noDraft).select("id"));
+      }
       if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
       }

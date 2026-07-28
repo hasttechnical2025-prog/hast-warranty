@@ -143,10 +143,38 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 2. Generate random lookup code
+    // 2. Tự thu nạp model nếu chưa có trong danh sách (không chặn nhân viên).
+    //    Guest/manager tạo -> đánh dấu NHÁP để admin chuẩn hoá; admin tạo -> chuẩn luôn.
+    try {
+      const { data: existModel } = await supabaseAdmin
+        .from('pbh_models')
+        .select('id')
+        .eq('model_name', String(model_name).trim())
+        .maybeSingle();
+      if (!existModel) {
+        const modelRow: any = {
+          model_name: String(model_name).trim(),
+          hang_sx: String(hang_sx || '').trim() || 'Chưa rõ',
+          loai_san_pham: String(loai_san_pham || '').trim() || 'Máy photocopy',
+          cau_hinh: String(cau_hinh || '').trim() || 'Chưa rõ',
+          so_ban_chup_mac_dinh: Number(so_ban_chup) > 0 ? Math.floor(Number(so_ban_chup)) : 0,
+          so_thang_mac_dinh: Number(so_thang) > 0 ? Math.floor(Number(so_thang)) : 12,
+          is_draft: session.role !== 'admin',
+        };
+        const { error: mErr } = await supabaseAdmin.from('pbh_models').insert(modelRow);
+        if (mErr && /is_draft/.test(mErr.message || '')) {
+          const { is_draft: _d, ...noDraft } = modelRow;
+          await supabaseAdmin.from('pbh_models').insert(noDraft);
+        }
+      }
+    } catch {
+      /* không để việc thu nạp model làm hỏng tạo phiếu */
+    }
+
+    // 3. Generate random lookup code
     const lookupCode = generateSearchCode();
 
-    // 3. Create Ticket
+    // 4. Create Ticket
     const ticketData: any = {
       khach_hang_id: finalCustomerId || null,
       ten_khach_hang: ten_khach_hang.trim(),

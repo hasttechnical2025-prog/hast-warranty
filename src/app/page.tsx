@@ -52,6 +52,7 @@ export default function RegisterWarrantyPage() {
   const [khachHangId, setKhachHangId] = useState<number | null>(null);
   const [diaChi, setDiaChi] = useState<string>("");
   const [selectedModel, setSelectedModel] = useState<string>("");
+  const [newModelName, setNewModelName] = useState<string>("");
   const [loaiSanPham, setLoaiSanPham] = useState<string>("");
   const [hangSx, setHangSx] = useState<string>("");
   const [serial, setSerial] = useState<string>("");
@@ -152,6 +153,16 @@ export default function RegisterWarrantyPage() {
   // Handle Model selection and auto-populate
   const handleModelChange = (modelName: string) => {
     setSelectedModel(modelName);
+    // Chế độ "Model mới": cho nhân viên tự nhập, các ô hãng/loại/cấu hình để họ điền tay
+    if (modelName === "__new__") {
+      setNewModelName("");
+      setLoaiSanPham("Máy photocopy");
+      setHangSx("");
+      setCauHinh("");
+      setSoBanChup("");
+      setSoThang("12");
+      return;
+    }
     const model = models.find((m) => m.model_name === modelName);
     if (model) {
       setLoaiSanPham(model.loai_san_pham);
@@ -196,6 +207,7 @@ export default function RegisterWarrantyPage() {
     setKhachHangId(null);
     setDiaChi("");
     setSelectedModel("");
+    setNewModelName("");
     setLoaiSanPham("");
     setHangSx("");
     setSerial("");
@@ -233,6 +245,10 @@ export default function RegisterWarrantyPage() {
       setErrorMsg("Vui lòng chọn Model máy.");
       return;
     }
+    if (selectedModel === "__new__" && (!newModelName.trim() || !hangSx.trim())) {
+      setErrorMsg("Model mới: vui lòng nhập Tên model và Hãng SX.");
+      return;
+    }
     if ((Number(soBanChup) || 0) <= 0 && (Number(soThang) || 0) <= 0) {
       setErrorMsg("Cần ít nhất một chế độ bảo hành: theo bản chụp hoặc theo tháng.");
       return;
@@ -250,7 +266,7 @@ export default function RegisterWarrantyPage() {
           nguoi_dang_ky: nguoiDangKy,
           ten_khach_hang: tenKhachHang,
           dia_chi: diaChi,
-          model_name: selectedModel,
+          model_name: selectedModel === "__new__" ? newModelName.trim() : selectedModel,
           loai_san_pham: loaiSanPham,
           hang_sx: hangSx,
           serial: serial,
@@ -281,6 +297,13 @@ export default function RegisterWarrantyPage() {
 
   const selectedModelData = models.find((m) => m.model_name === selectedModel);
   const soBanChupNum = Number(soBanChup);
+  const isNewModel = selectedModel === "__new__";
+  const modelSuggestions =
+    isNewModel && newModelName.trim().length >= 2
+      ? models
+          .filter((m) => m.model_name.toLowerCase().includes(newModelName.trim().toLowerCase()))
+          .slice(0, 6)
+      : [];
 
   // ---- Màn hình thành công ----
   if (successTicket) {
@@ -510,6 +533,7 @@ export default function RegisterWarrantyPage() {
                           {m.model_name} ({m.hang_sx})
                         </option>
                       ))}
+                      <option value="__new__">+ Nhập model mới (chưa có trong danh sách)</option>
                     </select>
                   </div>
 
@@ -531,38 +555,87 @@ export default function RegisterWarrantyPage() {
                   </div>
                 </div>
 
-                {/* Thông số tự điền theo model */}
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                  {[
-                    { label: "Hãng sản xuất", value: hangSx },
-                    { label: "Loại sản phẩm", value: loaiSanPham },
-                    { label: "Cấu hình", value: cauHinh },
-                  ].map(({ label, value }) => (
-                    <div
-                      key={label}
-                      className={`rounded-xl border px-3.5 py-2.5 transition ${
-                        value
-                          ? "border-emerald-200 bg-emerald-50"
-                          : "border-dashed border-slate-200 bg-slate-50"
-                      }`}
-                    >
-                      <div
-                        className={`text-[11px] font-medium uppercase tracking-wide ${
-                          value ? "text-emerald-600" : "text-slate-400"
-                        }`}
-                      >
-                        {label}
+                {/* Model mới: nhập tên + gợi ý tránh trùng */}
+                {isNewModel && (
+                  <div className="relative">
+                    <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                      Tên model mới <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      value={newModelName}
+                      onChange={(e) => setNewModelName(e.target.value)}
+                      placeholder="VD: AR300C"
+                      className={inputBase}
+                    />
+                    {modelSuggestions.length > 0 && (
+                      <div className="absolute z-20 mt-1 w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
+                        <div className="border-b border-slate-100 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-500">
+                          Có phải model này? (chọn để dùng lại, tránh tạo trùng)
+                        </div>
+                        {modelSuggestions.map((m) => (
+                          <button
+                            key={m.id}
+                            type="button"
+                            onClick={() => handleModelChange(m.model_name)}
+                            className="block w-full px-4 py-2 text-left text-sm hover:bg-emerald-50"
+                          >
+                            <span className="font-semibold text-slate-800">{m.model_name}</span>{" "}
+                            <span className="text-xs text-slate-500">({m.hang_sx})</span>
+                          </button>
+                        ))}
                       </div>
-                      <div
-                        className={`mt-0.5 truncate text-sm font-semibold ${
-                          value ? "text-slate-800" : "text-slate-400"
-                        }`}
-                      >
-                        {value || "Tự điền theo model"}
-                      </div>
+                    )}
+                    <p className="mt-1 text-[11px] text-amber-600">
+                      Model mới sẽ được lưu dạng <b>nháp</b> để admin chuẩn hoá sau. Phiếu vẫn chờ admin duyệt.
+                    </p>
+                  </div>
+                )}
+
+                {/* Hãng / Loại / Cấu hình: tự điền theo model, hoặc nhập tay khi là model mới */}
+                {isNewModel ? (
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    <div>
+                      <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                        Hãng SX <span className="text-red-500">*</span>
+                      </label>
+                      <input value={hangSx} onChange={(e) => setHangSx(e.target.value)} placeholder="VD: Asmix" className={inputBase} />
                     </div>
-                  ))}
-                </div>
+                    <div>
+                      <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                        Loại sản phẩm
+                      </label>
+                      <input value={loaiSanPham} onChange={(e) => setLoaiSanPham(e.target.value)} className={inputBase} />
+                    </div>
+                    <div>
+                      <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                        Cấu hình
+                      </label>
+                      <input value={cauHinh} onChange={(e) => setCauHinh(e.target.value)} className={inputBase} />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    {[
+                      { label: "Hãng sản xuất", value: hangSx },
+                      { label: "Loại sản phẩm", value: loaiSanPham },
+                      { label: "Cấu hình", value: cauHinh },
+                    ].map(({ label, value }) => (
+                      <div
+                        key={label}
+                        className={`rounded-xl border px-3.5 py-2.5 transition ${
+                          value ? "border-emerald-200 bg-emerald-50" : "border-dashed border-slate-200 bg-slate-50"
+                        }`}
+                      >
+                        <div className={`text-[11px] font-medium uppercase tracking-wide ${value ? "text-emerald-600" : "text-slate-400"}`}>
+                          {label}
+                        </div>
+                        <div className={`mt-0.5 truncate text-sm font-semibold ${value ? "text-slate-800" : "text-slate-400"}`}>
+                          {value || "Tự điền theo model"}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </section>
 
@@ -689,6 +762,7 @@ export default function RegisterWarrantyPage() {
                   !tenKhachHang.trim() ||
                   !diaChi.trim() ||
                   !selectedModel ||
+                  (isNewModel && (!newModelName.trim() || !hangSx.trim())) ||
                   ((Number(soBanChup) || 0) <= 0 && (Number(soThang) || 0) <= 0)
                 }
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 py-3.5 font-bold text-white shadow-sm shadow-emerald-500/20 transition hover:from-emerald-700 hover:to-teal-700 active:from-emerald-800 active:to-teal-800 disabled:from-slate-200 disabled:to-slate-200 disabled:text-slate-400 disabled:shadow-none"

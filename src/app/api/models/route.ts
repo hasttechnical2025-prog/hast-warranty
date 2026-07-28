@@ -45,17 +45,17 @@ export async function POST(request: NextRequest) {
       // Trống/0 = không bảo hành theo bản chụp (KHÔNG tự điền 100.000)
       so_ban_chup_mac_dinh: Number(so_ban_chup_mac_dinh) > 0 ? Math.floor(Number(so_ban_chup_mac_dinh)) : 0,
       so_thang_mac_dinh: Number(so_thang_mac_dinh) > 0 ? Math.floor(Number(so_thang_mac_dinh)) : 12,
+      // Admin thêm/sửa = chuẩn hoá -> bỏ cờ nháp
+      is_draft: false,
     };
+    const { is_draft: _drop, ...payloadNoDraft } = payload;
 
     if (id) {
       // Update
-      const { data, error } = await supabaseAdmin
-        .from('pbh_models')
-        .update(payload)
-        .eq('id', id)
-        .select()
-        .single();
-
+      let { data, error } = await supabaseAdmin.from('pbh_models').update(payload).eq('id', id).select().single();
+      if (error && /is_draft/.test(error.message || "")) {
+        ({ data, error } = await supabaseAdmin.from('pbh_models').update(payloadNoDraft).eq('id', id).select().single());
+      }
       if (error) {
         if (error.code === '23505') {
           return NextResponse.json({ error: `Đã có model tên "${payload.model_name}".` }, { status: 409 });
@@ -75,12 +75,10 @@ export async function POST(request: NextRequest) {
       }
 
       // Insert
-      const { data, error } = await supabaseAdmin
-        .from('pbh_models')
-        .insert(payload)
-        .select()
-        .single();
-
+      let { data, error } = await supabaseAdmin.from('pbh_models').insert(payload).select().single();
+      if (error && /is_draft/.test(error.message || "")) {
+        ({ data, error } = await supabaseAdmin.from('pbh_models').insert(payloadNoDraft).select().single());
+      }
       if (error) {
         if (error.code === '23505') {
           return NextResponse.json({ error: `Model "${payload.model_name}" đã tồn tại.` }, { status: 409 });
