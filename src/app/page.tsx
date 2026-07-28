@@ -53,8 +53,9 @@ export default function RegisterWarrantyPage() {
   const [tenKhachHang, setTenKhachHang] = useState<string>("");
   const [khachHangId, setKhachHangId] = useState<number | null>(null);
   const [diaChi, setDiaChi] = useState<string>("");
-  const [selectedModel, setSelectedModel] = useState<string>("");
-  const [newModelName, setNewModelName] = useState<string>("");
+  const [selectedModel, setSelectedModel] = useState<string>(""); // model_name đã chọn | "" | "__new__"
+  const [modelQuery, setModelQuery] = useState<string>(""); // chữ gõ trong combobox (cũng là tên khi model mới)
+  const [showModelDropdown, setShowModelDropdown] = useState<boolean>(false);
   const [loaiSanPham, setLoaiSanPham] = useState<string>("");
   const [hangSx, setHangSx] = useState<string>("");
   const [serial, setSerial] = useState<string>("");
@@ -74,6 +75,7 @@ export default function RegisterWarrantyPage() {
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
 
   const suggestionRef = useRef<HTMLDivElement>(null);
+  const modelBoxRef = useRef<HTMLDivElement>(null);
 
   // Set default today's date on load
   useEffect(() => {
@@ -144,42 +146,53 @@ export default function RegisterWarrantyPage() {
   // Click outside listener for suggestions list
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (suggestionRef.current && !suggestionRef.current.contains(event.target as Node)) {
+      const t = event.target as Node;
+      if (suggestionRef.current && !suggestionRef.current.contains(t)) {
         setShowCustSuggestions(false);
+      }
+      if (modelBoxRef.current && !modelBoxRef.current.contains(t)) {
+        setShowModelDropdown(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Handle Model selection and auto-populate
-  const handleModelChange = (modelName: string) => {
-    setSelectedModel(modelName);
-    // Chế độ "Model mới": cho nhân viên tự nhập, các ô hãng/loại/cấu hình để họ điền tay
-    if (modelName === "__new__") {
-      setNewModelName("");
-      setLoaiSanPham("Máy photocopy");
-      setHangSx("");
-      setCauHinh("");
-      setSoBanChup("");
-      setSoThang("12");
-      return;
-    }
-    const model = models.find((m) => m.model_name === modelName);
-    if (model) {
-      setLoaiSanPham(model.loai_san_pham);
-      setHangSx(model.hang_sx);
-      setCauHinh(model.cau_hinh);
-      // 0 = không có chế độ đó -> để trống ô cho gọn
-      setSoBanChup(model.so_ban_chup_mac_dinh > 0 ? String(model.so_ban_chup_mac_dinh) : "");
-      setSoThang(model.so_thang_mac_dinh > 0 ? String(model.so_thang_mac_dinh) : "");
-    } else {
+  // Gõ trong combobox: mở gợi ý; nếu đang chọn model cũ mà sửa chữ -> bỏ chọn (chờ chọn lại)
+  const onModelQueryChange = (val: string) => {
+    setModelQuery(val);
+    setShowModelDropdown(true);
+    if (selectedModel && selectedModel !== "__new__" && val !== selectedModel) {
+      setSelectedModel("");
       setLoaiSanPham("");
       setHangSx("");
       setCauHinh("");
       setSoBanChup("");
       setSoThang("");
     }
+  };
+
+  // Chọn 1 model có sẵn -> tự điền hãng/loại/cấu hình + mặc định bảo hành
+  const pickModel = (model: Model) => {
+    setSelectedModel(model.model_name);
+    setModelQuery(model.model_name);
+    setLoaiSanPham(model.loai_san_pham);
+    setHangSx(model.hang_sx);
+    setCauHinh(model.cau_hinh);
+    setSoBanChup(model.so_ban_chup_mac_dinh > 0 ? String(model.so_ban_chup_mac_dinh) : "");
+    setSoThang(model.so_thang_mac_dinh > 0 ? String(model.so_thang_mac_dinh) : "");
+    setShowModelDropdown(false);
+  };
+
+  // Chọn "thêm model mới": tên = chữ đang gõ, để nhân viên điền hãng/loại/cấu hình
+  const pickNewModel = () => {
+    setSelectedModel("__new__");
+    setLoaiSanPham("Máy photocopy");
+    setHangSx("");
+    setCauHinh("");
+    setSoBanChup("");
+    setSoThang("12");
+    setShowModelDropdown(false);
   };
 
   // Handle serial input: uppercase + keep only alphanumeric chars
@@ -209,7 +222,8 @@ export default function RegisterWarrantyPage() {
     setKhachHangId(null);
     setDiaChi("");
     setSelectedModel("");
-    setNewModelName("");
+    setModelQuery("");
+    setShowModelDropdown(false);
     setLoaiSanPham("");
     setHangSx("");
     setSerial("");
@@ -247,7 +261,7 @@ export default function RegisterWarrantyPage() {
       setErrorMsg("Vui lòng chọn Model máy.");
       return;
     }
-    if (selectedModel === "__new__" && (!newModelName.trim() || !hangSx.trim())) {
+    if (selectedModel === "__new__" && (!modelQuery.trim() || !hangSx.trim())) {
       setErrorMsg("Model mới: vui lòng nhập Tên model và Hãng SX.");
       return;
     }
@@ -268,7 +282,7 @@ export default function RegisterWarrantyPage() {
           nguoi_dang_ky: nguoiDangKy,
           ten_khach_hang: tenKhachHang,
           dia_chi: diaChi,
-          model_name: selectedModel === "__new__" ? newModelName.trim() : selectedModel,
+          model_name: selectedModel === "__new__" ? modelQuery.trim() : selectedModel,
           loai_san_pham: loaiSanPham,
           hang_sx: hangSx,
           serial: serial,
@@ -300,12 +314,15 @@ export default function RegisterWarrantyPage() {
   const selectedModelData = models.find((m) => m.model_name === selectedModel);
   const soBanChupNum = Number(soBanChup);
   const isNewModel = selectedModel === "__new__";
-  const modelSuggestions =
-    isNewModel && newModelName.trim().length >= 2
-      ? models
-          .filter((m) => m.model_name.toLowerCase().includes(newModelName.trim().toLowerCase()))
-          .slice(0, 6)
-      : [];
+  const modelQ = modelQuery.trim().toLowerCase();
+  const filteredModels = (
+    modelQ
+      ? models.filter(
+          (m) => m.model_name.toLowerCase().includes(modelQ) || (m.hang_sx || "").toLowerCase().includes(modelQ)
+        )
+      : models
+  ).slice(0, 8);
+  const exactModelMatch = models.some((m) => m.model_name.toLowerCase() === modelQ);
 
   // ---- Màn hình thành công ----
   if (successTicket) {
@@ -531,22 +548,44 @@ export default function RegisterWarrantyPage() {
                     <label className="mb-1.5 block text-sm font-medium text-slate-700">
                       Model sản phẩm <span className="text-red-500">*</span>
                     </label>
-                    <select
-                      value={selectedModel}
-                      onChange={(e) => handleModelChange(e.target.value)}
-                      className={inputBase}
-                      required
-                    >
-                      <option value="">
-                        {loadingModels ? "Đang tải danh sách..." : "-- Chọn Model --"}
-                      </option>
-                      {models.map((m) => (
-                        <option key={m.id} value={m.model_name}>
-                          {m.model_name} ({m.hang_sx})
-                        </option>
-                      ))}
-                      <option value="__new__">+ Nhập model mới (chưa có trong danh sách)</option>
-                    </select>
+                    <div className="relative" ref={modelBoxRef}>
+                      <input
+                        type="text"
+                        value={modelQuery}
+                        onChange={(e) => onModelQueryChange(e.target.value)}
+                        onFocus={() => setShowModelDropdown(true)}
+                        placeholder={loadingModels ? "Đang tải danh sách..." : "Gõ tên model để tìm..."}
+                        className={inputBase}
+                        autoComplete="off"
+                      />
+                      {showModelDropdown && (
+                        <div className="absolute z-30 mt-1 max-h-64 w-full overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-lg">
+                          {filteredModels.map((m) => (
+                            <button
+                              key={m.id}
+                              type="button"
+                              onClick={() => pickModel(m)}
+                              className="flex w-full items-center justify-between gap-2 border-b border-slate-50 px-3.5 py-2 text-left text-sm hover:bg-brand-50"
+                            >
+                              <span className="font-semibold text-slate-800">{m.model_name}</span>
+                              <span className="shrink-0 text-xs text-slate-400">{m.hang_sx}</span>
+                            </button>
+                          ))}
+                          {modelQuery.trim() && !exactModelMatch && (
+                            <button
+                              type="button"
+                              onClick={pickNewModel}
+                              className="block w-full px-3.5 py-2 text-left text-sm text-amber-700 hover:bg-amber-50"
+                            >
+                              + Thêm model mới: <b>“{modelQuery.trim()}”</b>
+                            </button>
+                          )}
+                          {filteredModels.length === 0 && !modelQuery.trim() && (
+                            <div className="px-3.5 py-3 text-sm text-slate-400">Gõ để tìm model…</div>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {/* Serial */}
@@ -567,40 +606,11 @@ export default function RegisterWarrantyPage() {
                   </div>
                 </div>
 
-                {/* Model mới: nhập tên + gợi ý tránh trùng */}
+                {/* Model mới: nhắc lưu nháp (tên đã nằm trong ô combobox phía trên) */}
                 {isNewModel && (
-                  <div className="relative">
-                    <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                      Tên model mới <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      value={newModelName}
-                      onChange={(e) => setNewModelName(e.target.value)}
-                      placeholder="VD: AR300C"
-                      className={inputBase}
-                    />
-                    {modelSuggestions.length > 0 && (
-                      <div className="absolute z-20 mt-1 w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
-                        <div className="border-b border-slate-100 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-500">
-                          Có phải model này? (chọn để dùng lại, tránh tạo trùng)
-                        </div>
-                        {modelSuggestions.map((m) => (
-                          <button
-                            key={m.id}
-                            type="button"
-                            onClick={() => handleModelChange(m.model_name)}
-                            className="block w-full px-4 py-2 text-left text-sm hover:bg-brand-50"
-                          >
-                            <span className="font-semibold text-slate-800">{m.model_name}</span>{" "}
-                            <span className="text-xs text-slate-500">({m.hang_sx})</span>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                    <p className="mt-1 text-[11px] text-amber-600">
-                      Model mới sẽ được lưu dạng <b>nháp</b> để admin chuẩn hoá sau. Phiếu vẫn chờ admin duyệt.
-                    </p>
-                  </div>
+                  <p className="text-[11px] text-amber-600">
+                    Model mới <b>“{modelQuery.trim()}”</b> sẽ được lưu dạng <b>nháp</b> để admin chuẩn hoá sau. Phiếu vẫn chờ admin duyệt.
+                  </p>
                 )}
 
                 {/* Hãng / Loại / Cấu hình: tự điền theo model, hoặc nhập tay khi là model mới */}
@@ -774,7 +784,7 @@ export default function RegisterWarrantyPage() {
                   !tenKhachHang.trim() ||
                   !diaChi.trim() ||
                   !selectedModel ||
-                  (isNewModel && (!newModelName.trim() || !hangSx.trim())) ||
+                  (isNewModel && (!modelQuery.trim() || !hangSx.trim())) ||
                   ((Number(soBanChup) || 0) <= 0 && (Number(soThang) || 0) <= 0)
                 }
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-brand-600 py-3.5 font-bold text-white shadow-sm shadow-brand-500/20 transition hover:from-brand-700 hover:to-brand-700 active:from-brand-800 active:to-brand-800 disabled:from-slate-200 disabled:to-slate-200 disabled:text-slate-400 disabled:shadow-none"
