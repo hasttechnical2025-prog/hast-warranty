@@ -47,8 +47,8 @@ export async function middleware(request: NextRequest) {
 
   const loginUrl = new URL('/admin/login', request.url);
 
-  // Trang đăng ký: chỉ cần đã đăng nhập (bất kỳ vai trò)
-  if (pathname === '/') {
+  // Trang đăng ký (lẻ + hàng loạt): chỉ cần đã đăng nhập (bất kỳ vai trò)
+  if (pathname === '/' || pathname === '/hang-loat') {
     if (!session) return NextResponse.redirect(loginUrl);
     return NextResponse.next();
   }
@@ -69,5 +69,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/admin/:path*'],
+  matcher: ['/', '/hang-loat', '/admin/:path*'],
 };

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { DateField } from "@/components/DateField";
 import { DEFAULT_SETTINGS, type AppSettings } from "@/lib/settings";
 import {
@@ -19,6 +20,7 @@ import {
   Send,
   BadgeCheck,
   Info,
+  Layers,
 } from "lucide-react";
 
 // Icon cho các dòng lợi ích ở panel trái (lặp lại nếu nhiều hơn số icon).
@@ -388,11 +390,15 @@ export default function RegisterWarrantyPage() {
 
         {/* ===== Biểu mẫu ===== */}
         <div className="p-6 sm:p-8">
-          <div className="mb-6 flex items-center justify-between">
+          <div className="mb-6 flex items-center justify-between gap-3">
             <h2 className="text-lg font-bold text-slate-800">Đăng ký phiếu mới</h2>
-            <span className="text-xs text-slate-400">
-              <span className="text-red-500">*</span> Bắt buộc
-            </span>
+            <Link
+              href="/hang-loat"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-700 hover:bg-emerald-100"
+            >
+              <Layers className="h-4 w-4" />
+              Đăng ký hàng loạt
+            </Link>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8">

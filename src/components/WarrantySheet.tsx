@@ -16,6 +16,8 @@ interface WarrantySheetProps {
   profile: TemplateProfile;
   qrUrl: string;
   showBg: boolean;
+  /** id DOM cho khổ giấy. Mặc định "a5-print-sheet" (in đơn). In hàng loạt truyền "" để tránh trùng id. */
+  domId?: string;
   /** Chế độ căn phôi: cho kéo-thả + hiện khối rỗng */
   editable?: boolean;
   selectedKey?: string | null;
@@ -83,6 +85,7 @@ export function WarrantySheet({
   profile,
   qrUrl,
   showBg,
+  domId = "a5-print-sheet",
   editable = false,
   selectedKey = null,
   onSelectField,
@@ -119,7 +122,7 @@ export function WarrantySheet({
 
   return (
     <div
-      id="a5-print-sheet"
+      id={domId || undefined}
       ref={sheetRef}
       className="relative bg-white text-black font-sans overflow-hidden select-none print-layout"
       style={{
