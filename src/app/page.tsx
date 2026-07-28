@@ -358,7 +358,13 @@ export default function RegisterWarrantyPage() {
           <div className="pointer-events-none absolute -bottom-20 -left-10 h-48 w-48 rounded-full bg-white/5" />
 
           <div className="relative">
-            <div className="inline-flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl bg-white/15 ring-1 ring-white/25 backdrop-blur">
+            <div
+              className={`inline-flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl ${
+                settings.logo_data_url
+                  ? "bg-white p-1.5 shadow-lg shadow-brand-900/40 ring-1 ring-white/60"
+                  : "bg-white/15 ring-1 ring-white/25 backdrop-blur"
+              }`}
+            >
               {settings.logo_data_url ? (
                 <img src={settings.logo_data_url} alt="logo" className="h-full w-full object-contain" />
               ) : (
