@@ -2,8 +2,15 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, Printer, CheckCircle, Clock, Pencil, Hourglass, CheckCheck, XCircle } from "lucide-react";
+import { Search, Printer, CheckCircle, Clock, Pencil, Hourglass, CheckCheck, XCircle, ClipboardList, AlertTriangle } from "lucide-react";
 import { EditTicketModal } from "@/components/EditTicketModal";
+
+const STAT_CARDS = [
+  { key: null as string | null, label: "Tổng phiếu", icon: ClipboardList, tint: "bg-brand-50 text-brand-600", field: "total" as const },
+  { key: "cho_duyet", label: "Chờ duyệt", icon: Hourglass, tint: "bg-orange-50 text-orange-600", field: "cho_duyet" as const },
+  { key: "cho_in", label: "Chờ in", icon: Clock, tint: "bg-amber-50 text-amber-600", field: "cho_in" as const },
+  { key: "da_in", label: "Đã in", icon: CheckCircle, tint: "bg-emerald-50 text-emerald-600", field: "da_in" as const },
+];
 
 interface Ticket {
   id: number;
@@ -17,12 +24,6 @@ interface Ticket {
   created_at: string;
 }
 
-const TABS = [
-  { key: "cho_duyet", label: "Chờ duyệt", icon: Hourglass, color: "text-orange-600" },
-  { key: "cho_in", label: "Chờ in", icon: Clock, color: "text-amber-600" },
-  { key: "da_in", label: "Đã in", icon: CheckCircle, color: "text-emerald-600" },
-];
-
 export default function AdminDashboardPage() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -31,12 +32,17 @@ export default function AdminDashboardPage() {
   const [editId, setEditId] = useState<number | null>(null);
   const [role, setRole] = useState<string>("");
   const [busyId, setBusyId] = useState<number | null>(null);
+  const [counts, setCounts] = useState<{ cho_duyet: number; cho_in: number; da_in: number; total: number }>({
+    cho_duyet: 0, cho_in: 0, da_in: 0, total: 0,
+  });
+
+  const fetchCounts = () => {
+    fetch("/api/tickets/counts").then((r) => r.json()).then((d) => { if (d && !d.error) setCounts(d); }).catch(() => {});
+  };
 
   useEffect(() => {
-    fetch("/api/admin/me")
-      .then((r) => r.json())
-      .then((d) => setRole(d.role || ""))
-      .catch(() => {});
+    fetch("/api/admin/me").then((r) => r.json()).then((d) => setRole(d.role || "")).catch(() => {});
+    fetchCounts();
   }, []);
 
   const fetchTickets = () => {
@@ -51,6 +57,7 @@ export default function AdminDashboardPage() {
         console.error("Failed to load tickets", err);
         setLoading(false);
       });
+    fetchCounts();
   };
 
   useEffect(() => {
@@ -92,26 +99,46 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 w-full flex-1 flex flex-col">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">Quản lý Phiếu Bảo hành</h1>
-          <p className="text-slate-500 text-sm mt-1">Duyệt yêu cầu và in phiếu khớp phôi giấy A5</p>
-        </div>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-slate-800">Quản lý Phiếu Bảo hành</h1>
+        <p className="text-slate-500 text-sm mt-1">Chọn thẻ bên dưới để lọc — duyệt yêu cầu rồi in phiếu khớp phôi A5.</p>
+      </div>
 
-        <div className="flex bg-slate-200 p-1 rounded-lg">
-          {TABS.map(({ key, label, icon: Icon, color }) => (
+      {/* Banner: có phiếu chờ duyệt */}
+      {counts.cho_duyet > 0 && (
+        <button
+          onClick={() => setFilter("cho_duyet")}
+          className="mb-4 flex w-full items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-left text-sm text-amber-800 transition hover:bg-amber-100"
+        >
+          <AlertTriangle className="h-5 w-5 shrink-0 text-amber-500" />
+          <span>
+            <b>{counts.cho_duyet} yêu cầu</b> đang chờ duyệt — hãy duyệt trước khi in.
+          </span>
+        </button>
+      )}
+
+      {/* Thẻ KPI */}
+      <div className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        {STAT_CARDS.map(({ key, label, icon: Icon, tint, field }) => {
+          const active = filter === key;
+          return (
             <button
-              key={key}
-              onClick={() => setFilter(key)}
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition ${
-                filter === key ? `bg-white ${color} shadow-sm` : "text-slate-600 hover:text-slate-800"
-              }`}
+              key={label}
+              onClick={() => key && setFilter(key)}
+              className={`flex items-center gap-3 rounded-2xl border bg-white p-4 text-left shadow-sm transition ${
+                key ? "hover:border-brand-300 cursor-pointer" : "cursor-default"
+              } ${active ? "border-brand-500 ring-2 ring-brand-500/15" : "border-slate-200"}`}
             >
-              <Icon className="h-4 w-4" />
-              {label}
+              <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${tint}`}>
+                <Icon className="h-5 w-5" />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-xs font-medium text-slate-500">{label}</span>
+                <span className="block text-2xl font-bold text-slate-800">{counts[field]}</span>
+              </span>
             </button>
-          ))}
-        </div>
+          );
+        })}
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex-1 flex flex-col">
