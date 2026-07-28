@@ -40,7 +40,12 @@ export async function POST(request: NextRequest) {
     }
 
     const payload: any = { full_name: String(full_name).trim(), role };
-    if (username !== undefined) payload.username = String(username).trim() || null;
+    // Guest không có tên đăng nhập (đăng nhập bằng link). Tránh lưu chuỗi "null".
+    if (role === "guest") {
+      payload.username = null;
+    } else if (username !== undefined && username !== null) {
+      payload.username = String(username).trim() || null;
+    }
     if (typeof is_active === "boolean") payload.is_active = is_active;
     if (password) payload.password = hashPassword(String(password));
 
