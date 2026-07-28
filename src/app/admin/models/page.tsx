@@ -85,7 +85,7 @@ export default function ManageModelsPage() {
             </button>
             <button
               onClick={openAdd}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-brand-700"
             >
               <Plus className="h-4 w-4" />
               Thêm mới
@@ -106,7 +106,7 @@ export default function ManageModelsPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Tìm theo tên model hoặc hãng..."
-                className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-md bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-md bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
             </div>
             {draftCount > 0 && (
@@ -169,7 +169,7 @@ export default function ManageModelsPage() {
                         <div className="flex justify-end gap-2">
                           <button
                             onClick={() => openEdit(m)}
-                            className="p-1.5 bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 rounded transition"
+                            className="p-1.5 bg-slate-100 hover:bg-brand-50 text-slate-600 hover:text-brand-700 rounded transition"
                             title="Sửa model"
                           >
                             <Edit2 className="h-4 w-4" />

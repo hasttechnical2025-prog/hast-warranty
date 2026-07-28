@@ -8,8 +8,8 @@ import { DEFAULT_SETTINGS, type AppSettings } from "@/lib/settings";
 
 type Role = "guest" | "manager" | "admin" | null;
 
-// Các route thuộc khu "Cài đặt" (tab con nằm trong AdminSettingsTabs)
 const SETTINGS_ROUTES = ["/admin/cai-dat", "/admin/models", "/admin/can-phoi", "/admin/nguoi-dung"];
+const ROLE_LABEL: Record<string, string> = { guest: "GUEST", manager: "MANAGER", admin: "ADMIN" };
 
 export function Header() {
   const pathname = usePathname();
@@ -19,31 +19,20 @@ export function Header() {
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
 
   useEffect(() => {
-    fetch("/api/settings")
-      .then((r) => r.json())
-      .then((d) => {
-        if (d && !d.error) setSettings(d);
-      })
-      .catch(() => {});
+    fetch("/api/settings").then((r) => r.json()).then((d) => { if (d && !d.error) setSettings(d); }).catch(() => {});
   }, [pathname]);
 
   useEffect(() => {
-    fetch("/api/admin/me")
-      .then((r) => r.json())
-      .then((d) => {
-        setRole(d.authenticated ? d.role : null);
-        setFullName(d.full_name || "");
-      })
-      .catch(() => setRole(null));
+    fetch("/api/admin/me").then((r) => r.json()).then((d) => {
+      setRole(d.authenticated ? d.role : null);
+      setFullName(d.full_name || "");
+    }).catch(() => setRole(null));
   }, [pathname]);
 
   const handleLogout = async () => {
     try {
       const res = await fetch("/api/admin/logout", { method: "POST" });
-      if (res.ok) {
-        setRole(null);
-        router.push("/admin/login");
-      }
+      if (res.ok) { setRole(null); router.push("/admin/login"); }
     } catch (e) {
       console.error("Logout failed", e);
     }
@@ -52,59 +41,65 @@ export function Header() {
   const isManagerUp = role === "manager" || role === "admin";
   const isAdmin = role === "admin";
 
-  const navCls = (active: boolean) =>
-    `flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-      active ? "bg-emerald-50 text-emerald-700" : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+  const pill = (active: boolean) =>
+    `flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-semibold transition-colors ${
+      active ? "bg-brand-50 text-brand-700" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
     }`;
 
   return (
-    <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm no-print">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center gap-2">
+    <header className="no-print px-3 pt-3 sm:px-4 sm:pt-4">
+      <div className="mx-auto max-w-7xl rounded-2xl border border-slate-200 bg-white px-4 sm:px-5 shadow-sm">
+        <div className="flex h-16 items-center justify-between gap-4">
+          {/* Trái: logo + tên + tài khoản */}
+          <div className="flex items-center gap-3 min-w-0">
             {settings.logo_data_url ? (
-              <img src={settings.logo_data_url} alt="logo" className="h-9 w-9 rounded-lg object-contain" />
+              <img src={settings.logo_data_url} alt="logo" className="h-10 w-10 shrink-0 rounded-lg object-contain" />
             ) : (
-              <div className="bg-emerald-600 p-2 rounded-lg text-white">
+              <div className="shrink-0 rounded-lg bg-brand-600 p-2 text-white">
                 <Award className="h-5 w-5" />
               </div>
             )}
-            <div>
-              <span className="font-bold text-slate-800 text-lg tracking-tight">{settings.system_name}</span>
-              <span className="text-xs text-emerald-600 font-semibold block -mt-1">{settings.system_subtitle}</span>
+            <div className="min-w-0">
+              <div className="truncate text-base font-bold leading-tight text-slate-800 sm:text-lg">
+                {settings.system_name}
+              </div>
+              <div className="truncate text-xs leading-tight text-slate-500">
+                {role ? (
+                  <>
+                    Tài khoản: <span className="font-semibold text-slate-700">{fullName}</span>{" "}
+                    <span className="font-semibold text-brand-600">({ROLE_LABEL[role]})</span>
+                  </>
+                ) : (
+                  settings.system_subtitle
+                )}
+              </div>
             </div>
           </div>
 
-          <nav className="flex items-center gap-1 sm:gap-2">
+          {/* Phải: tab pill + đăng xuất */}
+          <nav className="flex items-center gap-1">
             {role && (
-              <Link href="/" className={navCls(pathname === "/")}>
+              <Link href="/" className={pill(pathname === "/" || pathname === "/hang-loat")}>
                 <ShieldAlert className="h-4 w-4" />
                 <span className="hidden sm:inline">Đăng ký</span>
               </Link>
             )}
-
             {isManagerUp && (
-              <Link
-                href="/admin"
-                className={navCls(pathname === "/admin" || pathname.startsWith("/admin/print"))}
-              >
+              <Link href="/admin" className={pill(pathname === "/admin" || pathname.startsWith("/admin/print") || pathname.startsWith("/admin/in-lo"))}>
                 <List className="h-4 w-4" />
                 <span className="hidden sm:inline">Duyệt &amp; In</span>
               </Link>
             )}
-
             {isAdmin && (
-              <Link href="/admin/cai-dat" className={navCls(SETTINGS_ROUTES.some((r) => pathname.startsWith(r)))}>
+              <Link href="/admin/cai-dat" className={pill(SETTINGS_ROUTES.some((r) => pathname.startsWith(r)))}>
                 <SlidersHorizontal className="h-4 w-4" />
                 <span className="hidden sm:inline">Cài đặt</span>
               </Link>
             )}
-
             {role && (
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors cursor-pointer"
-                title={fullName ? `Đăng xuất (${fullName})` : "Đăng xuất"}
+                className="ml-1 flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-red-600 transition-colors hover:border-red-200 hover:bg-red-50"
               >
                 <LogOut className="h-4 w-4" />
                 <span className="hidden sm:inline">Đăng xuất</span>

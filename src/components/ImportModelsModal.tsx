@@ -132,7 +132,7 @@ export function ImportModelsModal({ onClose, onImported }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div className="flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl">
-        <div className="flex items-center justify-between border-b border-slate-200 bg-emerald-600 px-5 py-3 text-white">
+        <div className="flex items-center justify-between border-b border-slate-200 bg-brand-600 px-5 py-3 text-white">
           <h2 className="flex items-center gap-2 font-bold">
             <FileSpreadsheet className="h-5 w-5" /> Nhập nhiều model từ Excel/CSV
           </h2>
@@ -166,7 +166,7 @@ export function ImportModelsModal({ onClose, onImported }: Props) {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder={"Dán dữ liệu từ Excel vào đây...\nAR300C\tHủy tài liệu\tMáy hủy tài liệu\tAsmix\ttại Khách hàng\t\t12"}
-            className="h-40 w-full resize-none rounded-lg border border-slate-300 p-3 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="h-40 w-full resize-none rounded-lg border border-slate-300 p-3 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
 
           {/* Xem trước */}
@@ -224,8 +224,8 @@ export function ImportModelsModal({ onClose, onImported }: Props) {
 
           {/* Kết quả */}
           {result && (
-            <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm">
-              <p className="flex items-center gap-2 font-semibold text-emerald-700">
+            <div className="rounded-lg border border-brand-200 bg-brand-50 px-4 py-3 text-sm">
+              <p className="flex items-center gap-2 font-semibold text-brand-700">
                 <CheckCircle2 className="h-4 w-4" /> Đã thêm {result.added} model mới.
               </p>
               {result.skipped.length > 0 && (
@@ -248,7 +248,7 @@ export function ImportModelsModal({ onClose, onImported }: Props) {
           <button
             onClick={doImport}
             disabled={importing || parsed.models.length === 0}
-            className="rounded-lg bg-emerald-600 px-5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700 disabled:bg-slate-300"
+            className="rounded-lg bg-brand-600 px-5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-brand-700 disabled:bg-slate-300"
           >
             {importing ? "Đang nhập..." : `Nhập ${parsed.models.length || ""} model`}
           </button>

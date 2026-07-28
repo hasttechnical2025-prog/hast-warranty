@@ -63,7 +63,7 @@ export default function LookupWarrantyPage() {
           <h2 className="text-xl font-bold text-slate-800">Không tìm thấy kết quả</h2>
           <p className="text-slate-500 mt-1 max-w-sm">Mã tra cứu không hợp lệ hoặc đã hết hạn trên hệ thống.</p>
         </div>
-        <Link href="/" className="px-4 py-2 bg-emerald-600 text-white rounded font-semibold text-sm hover:bg-emerald-700 transition">
+        <Link href="/" className="px-4 py-2 bg-brand-600 text-white rounded font-semibold text-sm hover:bg-brand-700 transition">
           Trở về Trang chủ
         </Link>
       </div>
@@ -92,7 +92,7 @@ export default function LookupWarrantyPage() {
     <div className="max-w-md mx-auto px-4 py-12 w-full flex-1 flex flex-col justify-center">
       <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
         {/* Banner */}
-        <div className={`p-6 text-white text-center flex flex-col items-center gap-2 ${isExpired ? "bg-red-600" : "bg-emerald-600"}`}>
+        <div className={`p-6 text-white text-center flex flex-col items-center gap-2 ${isExpired ? "bg-red-600" : "bg-brand-600"}`}>
           {isExpired ? (
             <>
               <AlertTriangle className="h-12 w-12" />
@@ -146,7 +146,7 @@ export default function LookupWarrantyPage() {
               <Calendar className="h-4 w-4 text-slate-400" />
               Ngày hết hạn bảo hành:
             </span>
-            <span className={`font-semibold ${isExpired ? "text-red-600 font-bold" : "text-emerald-600 font-bold"}`}>
+            <span className={`font-semibold ${isExpired ? "text-red-600 font-bold" : "text-brand-600 font-bold"}`}>
               {formatDate(expDate)}
             </span>
           </div>

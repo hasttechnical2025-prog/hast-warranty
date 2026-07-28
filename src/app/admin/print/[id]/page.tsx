@@ -116,7 +116,7 @@ export default function PrintTicketPage() {
                 onClick={() => setProfileKey(p.profile_key)}
                 className={`px-3 py-1.5 rounded-md text-sm font-medium transition ${
                   profileKey === p.profile_key
-                    ? "bg-emerald-600 text-white"
+                    ? "bg-brand-600 text-white"
                     : "text-slate-300 hover:text-white"
                 }`}
               >
@@ -144,7 +144,7 @@ export default function PrintTicketPage() {
 
           <button
             onClick={handlePrint}
-            className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded text-sm font-semibold transition shadow-sm"
+            className="flex items-center gap-1.5 px-4 py-2 bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white rounded text-sm font-semibold transition shadow-sm"
           >
             <Printer className="h-4 w-4" />
             <span>In Phiếu (Ctrl+P)</span>

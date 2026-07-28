@@ -41,12 +41,12 @@ export default function AdminLoginPage() {
   return (
     <div className="flex-1 flex items-center justify-center p-6 bg-slate-100">
       <div className="w-full max-w-sm bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
-        <div className="bg-emerald-600 p-6 text-white text-center flex flex-col items-center gap-2">
+        <div className="bg-brand-600 p-6 text-white text-center flex flex-col items-center gap-2">
           <div className="bg-white/10 p-3 rounded-full">
             <Lock className="h-8 w-8" />
           </div>
           <h1 className="font-bold text-lg">ĐĂNG NHẬP HỆ THỐNG</h1>
-          <p className="text-xs text-emerald-100">Dành cho Manager / Admin</p>
+          <p className="text-xs text-brand-100">Dành cho Manager / Admin</p>
         </div>
 
         <form onSubmit={handleLogin} className="p-6 space-y-4">
@@ -69,7 +69,7 @@ export default function AdminLoginPage() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Tên đăng nhập..."
-              className="w-full px-3 py-2 border border-slate-300 rounded-md bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full px-3 py-2 border border-slate-300 rounded-md bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </div>
 
@@ -83,14 +83,14 @@ export default function AdminLoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Nhập mật khẩu..."
-              className="w-full px-3 py-2 border border-slate-300 rounded-md bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full px-3 py-2 border border-slate-300 rounded-md bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 bg-emerald-600 text-white font-bold rounded-lg hover:bg-emerald-700 active:bg-emerald-800 transition disabled:bg-slate-300 shadow-sm"
+            className="w-full py-2.5 bg-brand-600 text-white font-bold rounded-lg hover:bg-brand-700 active:bg-brand-800 transition disabled:bg-slate-300 shadow-sm"
           >
             {loading ? "Đang xác thực..." : "ĐĂNG NHẬP"}
           </button>

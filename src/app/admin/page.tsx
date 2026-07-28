@@ -123,7 +123,7 @@ export default function AdminDashboardPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Tìm số phiếu, tên khách, serial..."
-              className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-md bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-md bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
             <button type="submit" className="hidden">Search</button>
           </form>
@@ -194,7 +194,7 @@ export default function AdminDashboardPage() {
                             href={`/admin/print/${t.id}`}
                             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-sm font-medium transition ${
                               t.trang_thai === "cho_in"
-                                ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                                ? "bg-brand-100 text-brand-700 hover:bg-brand-200"
                                 : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                             }`}
                           >

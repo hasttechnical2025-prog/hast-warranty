@@ -131,14 +131,14 @@ export function EditTicketModal({ ticketId, onClose, onSaved }: EditTicketModalP
   };
 
   const inputCls =
-    "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500";
+    "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500";
   const roCls = "w-full rounded-lg border border-slate-200 bg-slate-100 px-3 py-2 text-sm text-slate-500";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div className="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-200 bg-emerald-600 px-5 py-3 text-white">
+        <div className="flex items-center justify-between border-b border-slate-200 bg-brand-600 px-5 py-3 text-white">
           <h2 className="font-bold">
             Sửa phiếu bảo hành {soPhieu ? `#${soPhieu}` : ""}
           </h2>
@@ -248,7 +248,7 @@ export function EditTicketModal({ ticketId, onClose, onSaved }: EditTicketModalP
                         onClick={() => setDiaDiemBaoHanh(v)}
                         className={`flex-1 rounded-lg border px-2 py-2 text-sm font-medium transition ${
                           diaDiemBaoHanh === v
-                            ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+                            ? "border-brand-500 bg-brand-50 text-brand-700"
                             : "border-slate-200 text-slate-600 hover:border-slate-300"
                         }`}
                       >
@@ -295,7 +295,7 @@ export function EditTicketModal({ ticketId, onClose, onSaved }: EditTicketModalP
           <button
             onClick={handleSave}
             disabled={loading || saving}
-            className="flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700 disabled:bg-slate-300"
+            className="flex items-center gap-2 rounded-lg bg-brand-600 px-5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-brand-700 disabled:bg-slate-300"
           >
             <Save className="h-4 w-4" />
             {saving ? "Đang lưu..." : "Lưu thay đổi"}

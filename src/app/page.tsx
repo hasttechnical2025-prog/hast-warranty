@@ -28,7 +28,7 @@ const BENEFIT_ICONS = [QrCode, Cloud, Printer];
 
 // Lớp dùng chung cho input để đồng bộ giao diện toàn form.
 const inputBase =
-  "w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm transition focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/15";
+  "w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm transition focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/15";
 
 interface Model {
   id: number;
@@ -311,7 +311,7 @@ export default function RegisterWarrantyPage() {
   if (successTicket) {
     return (
       <div className="w-full flex-1 flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-lg rounded-3xl border border-emerald-100 bg-white p-8 text-center shadow-xl shadow-emerald-100/40">
+        <div className="w-full max-w-lg rounded-3xl border border-brand-100 bg-white p-8 text-center shadow-xl shadow-brand-100/40">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 ring-8 ring-emerald-50">
             <CircleCheck className="h-11 w-11" />
           </div>
@@ -332,7 +332,7 @@ export default function RegisterWarrantyPage() {
           <div className="mt-7 flex flex-col gap-3 sm:flex-row">
             <button
               onClick={resetForm}
-              className="flex-1 rounded-xl bg-emerald-600 px-6 py-3 font-semibold text-white shadow-sm transition hover:bg-emerald-700 active:bg-emerald-800"
+              className="flex-1 rounded-xl bg-brand-600 px-6 py-3 font-semibold text-white shadow-sm transition hover:bg-brand-700 active:bg-brand-800"
             >
               Đăng ký phiếu mới
             </button>
@@ -353,7 +353,7 @@ export default function RegisterWarrantyPage() {
     <div className="w-full flex-1 px-4 py-8 sm:py-10">
       <div className="mx-auto grid w-full max-w-5xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
         {/* ===== Panel thương hiệu ===== */}
-        <aside className="relative flex flex-col justify-between overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-600 to-teal-700 p-8 text-white">
+        <aside className="relative flex flex-col justify-between overflow-hidden bg-gradient-to-br from-brand-600 via-brand-600 to-brand-700 p-8 text-white">
           <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-white/10" />
           <div className="pointer-events-none absolute -bottom-20 -left-10 h-48 w-48 rounded-full bg-white/5" />
 
@@ -366,7 +366,7 @@ export default function RegisterWarrantyPage() {
               )}
             </div>
             <h1 className="mt-6 text-2xl font-bold leading-tight">{settings.reg_panel_title}</h1>
-            <p className="mt-2 text-sm leading-relaxed text-emerald-50/90">{settings.reg_panel_desc}</p>
+            <p className="mt-2 text-sm leading-relaxed text-brand-50/90">{settings.reg_panel_desc}</p>
           </div>
 
           <ul className="relative mt-8 space-y-4">
@@ -377,13 +377,13 @@ export default function RegisterWarrantyPage() {
                   <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/15 ring-1 ring-white/20">
                     <Icon className="h-4 w-4" />
                   </span>
-                  <span className="text-sm leading-snug text-emerald-50/95">{text}</span>
+                  <span className="text-sm leading-snug text-brand-50/95">{text}</span>
                 </li>
               );
             })}
           </ul>
 
-          <div className="relative mt-8 border-t border-white/15 pt-5 text-xs text-emerald-50/80">
+          <div className="relative mt-8 border-t border-white/15 pt-5 text-xs text-brand-50/80">
             {settings.reg_panel_footer}
           </div>
         </aside>
@@ -394,7 +394,7 @@ export default function RegisterWarrantyPage() {
             <h2 className="text-lg font-bold text-slate-800">Đăng ký phiếu mới</h2>
             <Link
               href="/hang-loat"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-700 hover:bg-emerald-100"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-brand-200 bg-brand-50 px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-100"
             >
               <Layers className="h-4 w-4" />
               Đăng ký hàng loạt
@@ -412,11 +412,11 @@ export default function RegisterWarrantyPage() {
             {/* ---- Bước 1: Khách hàng ---- */}
             <section className="space-y-4">
               <div className="flex items-center gap-3">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 text-sm font-bold text-white">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-600 text-sm font-bold text-white">
                   1
                 </span>
                 <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-emerald-600" />
+                  <User className="h-4 w-4 text-brand-600" />
                   <h3 className="font-semibold text-slate-800">Thông tin khách hàng</h3>
                 </div>
               </div>
@@ -477,7 +477,7 @@ export default function RegisterWarrantyPage() {
                           key={cust.id}
                           type="button"
                           onClick={() => selectCustomer(cust)}
-                          className="flex w-full flex-col gap-0.5 border-b border-slate-50 px-4 py-2 text-left text-sm transition hover:bg-emerald-50"
+                          className="flex w-full flex-col gap-0.5 border-b border-slate-50 px-4 py-2 text-left text-sm transition hover:bg-brand-50"
                         >
                           <span className="font-semibold text-slate-800">{cust.ten_khach_hang}</span>
                           <span className="line-clamp-1 text-xs text-slate-500">{cust.dia_chi}</span>
@@ -509,11 +509,11 @@ export default function RegisterWarrantyPage() {
             {/* ---- Bước 2: Sản phẩm ---- */}
             <section className="space-y-4">
               <div className="flex items-center gap-3">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 text-sm font-bold text-white">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-600 text-sm font-bold text-white">
                   2
                 </span>
                 <div className="flex items-center gap-2">
-                  <Cpu className="h-4 w-4 text-emerald-600" />
+                  <Cpu className="h-4 w-4 text-brand-600" />
                   <h3 className="font-semibold text-slate-800">Thông tin sản phẩm</h3>
                 </div>
               </div>
@@ -583,7 +583,7 @@ export default function RegisterWarrantyPage() {
                             key={m.id}
                             type="button"
                             onClick={() => handleModelChange(m.model_name)}
-                            className="block w-full px-4 py-2 text-left text-sm hover:bg-emerald-50"
+                            className="block w-full px-4 py-2 text-left text-sm hover:bg-brand-50"
                           >
                             <span className="font-semibold text-slate-800">{m.model_name}</span>{" "}
                             <span className="text-xs text-slate-500">({m.hang_sx})</span>
@@ -629,10 +629,10 @@ export default function RegisterWarrantyPage() {
                       <div
                         key={label}
                         className={`rounded-xl border px-3.5 py-2.5 transition ${
-                          value ? "border-emerald-200 bg-emerald-50" : "border-dashed border-slate-200 bg-slate-50"
+                          value ? "border-brand-200 bg-brand-50" : "border-dashed border-slate-200 bg-slate-50"
                         }`}
                       >
-                        <div className={`text-[11px] font-medium uppercase tracking-wide ${value ? "text-emerald-600" : "text-slate-400"}`}>
+                        <div className={`text-[11px] font-medium uppercase tracking-wide ${value ? "text-brand-600" : "text-slate-400"}`}>
                           {label}
                         </div>
                         <div className={`mt-0.5 truncate text-sm font-semibold ${value ? "text-slate-800" : "text-slate-400"}`}>
@@ -648,11 +648,11 @@ export default function RegisterWarrantyPage() {
             {/* ---- Bước 3: Chế độ bảo hành ---- */}
             <section className="space-y-4">
               <div className="flex items-center gap-3">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 text-sm font-bold text-white">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-600 text-sm font-bold text-white">
                   3
                 </span>
                 <div className="flex items-center gap-2">
-                  <BadgeCheck className="h-4 w-4 text-emerald-600" />
+                  <BadgeCheck className="h-4 w-4 text-brand-600" />
                   <h3 className="font-semibold text-slate-800">Chế độ &amp; địa điểm bảo hành</h3>
                 </div>
               </div>
@@ -729,13 +729,13 @@ export default function RegisterWarrantyPage() {
                           onClick={() => setDiaDiemBaoHanh(value)}
                           className={`flex items-center gap-3 rounded-xl border p-3 text-left transition ${
                             active
-                              ? "border-emerald-500 bg-emerald-50 ring-4 ring-emerald-500/10"
+                              ? "border-brand-500 bg-brand-50 ring-4 ring-brand-500/10"
                               : "border-slate-200 bg-white hover:border-slate-300"
                           }`}
                         >
                           <span
                             className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
-                              active ? "bg-emerald-600 text-white" : "bg-slate-100 text-slate-500"
+                              active ? "bg-brand-600 text-white" : "bg-slate-100 text-slate-500"
                             }`}
                           >
                             <Icon className="h-5 w-5" />
@@ -743,7 +743,7 @@ export default function RegisterWarrantyPage() {
                           <span className="min-w-0">
                             <span
                               className={`block text-sm font-semibold ${
-                                active ? "text-emerald-700" : "text-slate-700"
+                                active ? "text-brand-700" : "text-slate-700"
                               }`}
                             >
                               {value}
@@ -771,7 +771,7 @@ export default function RegisterWarrantyPage() {
                   (isNewModel && (!newModelName.trim() || !hangSx.trim())) ||
                   ((Number(soBanChup) || 0) <= 0 && (Number(soThang) || 0) <= 0)
                 }
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 py-3.5 font-bold text-white shadow-sm shadow-emerald-500/20 transition hover:from-emerald-700 hover:to-teal-700 active:from-emerald-800 active:to-teal-800 disabled:from-slate-200 disabled:to-slate-200 disabled:text-slate-400 disabled:shadow-none"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-brand-600 py-3.5 font-bold text-white shadow-sm shadow-brand-500/20 transition hover:from-brand-700 hover:to-brand-700 active:from-brand-800 active:to-brand-800 disabled:from-slate-200 disabled:to-slate-200 disabled:text-slate-400 disabled:shadow-none"
               >
                 <Send className="h-5 w-5" />
                 {submitting ? "Đang gửi yêu cầu..." : "Gửi yêu cầu cấp phiếu"}

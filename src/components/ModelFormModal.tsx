@@ -62,13 +62,13 @@ export function ModelFormModal({ model, onClose, onSaved }: Props) {
   }
 
   const inputCls =
-    "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500";
+    "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
   const labelCls = "mb-1 block text-sm font-medium text-slate-700";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div className="w-full max-w-lg rounded-2xl bg-white shadow-xl overflow-hidden">
-        <div className="flex items-center justify-between border-b border-slate-200 bg-emerald-600 px-5 py-3 text-white">
+        <div className="flex items-center justify-between border-b border-slate-200 bg-brand-600 px-5 py-3 text-white">
           <h2 className="flex items-center gap-2 font-bold">
             <Cpu className="h-5 w-5" /> {model ? "Sửa model máy" : "Thêm model máy mới"}
           </h2>
@@ -136,7 +136,7 @@ export function ModelFormModal({ model, onClose, onSaved }: Props) {
           <button
             onClick={save}
             disabled={saving}
-            className="flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700 disabled:bg-slate-300"
+            className="flex items-center gap-2 rounded-lg bg-brand-600 px-5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-brand-700 disabled:bg-slate-300"
           >
             <Save className="h-4 w-4" /> {saving ? "Đang lưu..." : model ? "Lưu thay đổi" : "Thêm mới"}
           </button>

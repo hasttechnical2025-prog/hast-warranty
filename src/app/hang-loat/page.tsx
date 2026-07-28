@@ -116,7 +116,7 @@ export default function BulkRegisterPage() {
   }
 
   const inputCls =
-    "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500";
+    "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500";
 
   // ----- Kết quả -----
   if (result) {
@@ -124,7 +124,7 @@ export default function BulkRegisterPage() {
     const canPrint = role === "manager" || role === "admin";
     return (
       <div className="w-full flex-1 flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-lg rounded-3xl border border-emerald-100 bg-white p-8 text-center shadow-xl">
+        <div className="w-full max-w-lg rounded-3xl border border-brand-100 bg-white p-8 text-center shadow-xl">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 ring-8 ring-emerald-50">
             <CircleCheck className="h-11 w-11" />
           </div>
@@ -142,7 +142,7 @@ export default function BulkRegisterPage() {
             {canPrint && result.created.length > 0 && (
               <Link
                 href={`/admin/in-lo?ids=${ids}`}
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-6 py-3 font-semibold text-white hover:bg-emerald-700"
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-6 py-3 font-semibold text-white hover:bg-brand-700"
               >
                 <Printer className="h-4 w-4" /> In hàng loạt
               </Link>
@@ -202,7 +202,7 @@ export default function BulkRegisterPage() {
                     type="button"
                     onClick={() => setDiaDiem(v)}
                     className={`rounded-lg border px-2 py-2 text-sm font-medium transition ${
-                      diaDiem === v ? "border-emerald-500 bg-emerald-50 text-emerald-700" : "border-slate-200 text-slate-600 hover:border-slate-300"
+                      diaDiem === v ? "border-brand-500 bg-brand-50 text-brand-700" : "border-slate-200 text-slate-600 hover:border-slate-300"
                     }`}
                   >
                     {v}
@@ -222,7 +222,7 @@ export default function BulkRegisterPage() {
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-base font-bold text-slate-800">2. Danh sách máy</h2>
             <div className="text-sm">
-              <span className="font-semibold text-emerald-600">{validRows.length} hợp lệ</span>
+              <span className="font-semibold text-brand-600">{validRows.length} hợp lệ</span>
               {unknownRows.length > 0 && <span className="ml-2 font-semibold text-red-600">{unknownRows.length} model lạ (sẽ bỏ qua)</span>}
             </div>
           </div>
@@ -236,7 +236,7 @@ export default function BulkRegisterPage() {
               value={pasteText}
               onChange={(e) => setPasteText(e.target.value)}
               placeholder={"Apeos 3561\t600186\t\t12\nbizhub 205i\tAB123\t\t12"}
-              className="h-20 w-full resize-none rounded-lg border border-slate-300 p-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="h-20 w-full resize-none rounded-lg border border-slate-300 p-2 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
             <button
               onClick={applyPaste}
@@ -278,7 +278,7 @@ export default function BulkRegisterPage() {
                           onChange={(e) => setRow(i, { model_name: e.target.value })}
                           placeholder="Chọn/nhập model"
                           className={`w-full rounded border px-2 py-1 text-sm focus:outline-none focus:ring-2 ${
-                            bad ? "border-red-300 focus:ring-red-400" : "border-slate-300 focus:ring-emerald-500"
+                            bad ? "border-red-300 focus:ring-red-400" : "border-slate-300 focus:ring-brand-500"
                           }`}
                         />
                         {bad && <span className="text-[11px] text-red-600">Model chưa có — sẽ bị bỏ qua</span>}
@@ -287,7 +287,7 @@ export default function BulkRegisterPage() {
                         <input
                           value={r.serial}
                           onChange={(e) => setRow(i, { serial: e.target.value.replace(/[^a-zA-Z0-9]/g, "").toUpperCase() })}
-                          className="w-full rounded border border-slate-300 px-2 py-1 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          className="w-full rounded border border-slate-300 px-2 py-1 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-brand-500"
                         />
                       </td>
                       <td className="px-3 py-1.5">
@@ -296,7 +296,7 @@ export default function BulkRegisterPage() {
                           value={r.so_ban_chup}
                           onChange={(e) => setRow(i, { so_ban_chup: e.target.value })}
                           placeholder="mặc định"
-                          className="w-full rounded border border-slate-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          className="w-full rounded border border-slate-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                         />
                       </td>
                       <td className="px-3 py-1.5">
@@ -305,7 +305,7 @@ export default function BulkRegisterPage() {
                           value={r.so_thang}
                           onChange={(e) => setRow(i, { so_thang: e.target.value })}
                           placeholder="mặc định"
-                          className="w-full rounded border border-slate-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          className="w-full rounded border border-slate-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                         />
                       </td>
                       <td className="px-3 py-1.5">
@@ -319,7 +319,7 @@ export default function BulkRegisterPage() {
               </tbody>
             </table>
           </div>
-          <button onClick={addRow} className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-emerald-600 hover:underline">
+          <button onClick={addRow} className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 hover:underline">
             <Plus className="h-4 w-4" /> Thêm dòng
           </button>
         </div>
@@ -327,7 +327,7 @@ export default function BulkRegisterPage() {
         <button
           onClick={submit}
           disabled={submitting || validRows.length === 0 || !tenKhachHang.trim() || !diaChi.trim()}
-          className="w-full rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 py-3.5 font-bold text-white shadow-sm transition hover:from-emerald-700 hover:to-teal-700 disabled:from-slate-200 disabled:to-slate-200 disabled:text-slate-400"
+          className="w-full rounded-xl bg-gradient-to-r from-brand-600 to-brand-600 py-3.5 font-bold text-white shadow-sm transition hover:from-brand-700 hover:to-brand-700 disabled:from-slate-200 disabled:to-slate-200 disabled:text-slate-400"
         >
           {submitting ? "Đang tạo..." : `Tạo ${validRows.length} phiếu`}
         </button>

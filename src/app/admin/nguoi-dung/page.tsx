@@ -133,7 +133,7 @@ export default function NguoiDungPage() {
   }
 
   const inputCls =
-    "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500";
+    "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
   const guestLink = (u: User | null) => (u?.login_token ? `${origin}/vao/${u.login_token}` : "");
 
   return (
@@ -143,14 +143,14 @@ export default function NguoiDungPage() {
       {/* Form */}
       <div className="lg:col-span-1">
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="bg-emerald-600 px-6 py-4 text-white flex items-center gap-2">
+          <div className="bg-brand-600 px-6 py-4 text-white flex items-center gap-2">
             <UserPlus className="h-5 w-5" />
             <h2 className="font-bold text-base">{editingId ? "CẬP NHẬT NGƯỜI DÙNG" : "THÊM NGƯỜI DÙNG"}</h2>
           </div>
           <div className="p-6 space-y-4">
             {err && <div className="p-3 bg-red-50 border-l-4 border-red-500 text-red-700 rounded text-xs">{err}</div>}
             {msg && (
-              <div className="p-3 bg-emerald-50 border-l-4 border-emerald-500 text-emerald-700 rounded text-xs flex items-center gap-1">
+              <div className="p-3 bg-brand-50 border-l-4 border-brand-500 text-brand-700 rounded text-xs flex items-center gap-1">
                 <ShieldCheck className="h-4 w-4" />
                 {msg}
               </div>
@@ -199,7 +199,7 @@ export default function NguoiDungPage() {
               <button
                 onClick={save}
                 disabled={saving}
-                className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition text-sm shadow-sm disabled:bg-slate-300"
+                className="flex-1 py-2 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-lg transition text-sm shadow-sm disabled:bg-slate-300"
               >
                 {saving ? "Đang lưu..." : editingId ? "CẬP NHẬT" : "THÊM MỚI"}
               </button>
@@ -246,7 +246,7 @@ export default function NguoiDungPage() {
                       </td>
                       <td className="px-5 py-3 text-slate-500">
                         {u.role === "guest" ? (
-                          <button onClick={() => setLinkUser(u)} className="inline-flex items-center gap-1 text-emerald-600 hover:underline">
+                          <button onClick={() => setLinkUser(u)} className="inline-flex items-center gap-1 text-brand-600 hover:underline">
                             <QrCode className="h-3.5 w-3.5" /> Link/QR
                           </button>
                         ) : (
@@ -255,7 +255,7 @@ export default function NguoiDungPage() {
                       </td>
                       <td className="px-5 py-3">
                         {u.is_active ? (
-                          <span className="text-emerald-600 text-xs font-medium">Hoạt động</span>
+                          <span className="text-brand-600 text-xs font-medium">Hoạt động</span>
                         ) : (
                           <span className="text-slate-400 text-xs font-medium">Đã khoá</span>
                         )}
@@ -265,7 +265,7 @@ export default function NguoiDungPage() {
                           <button onClick={() => toggleActive(u)} title={u.is_active ? "Khoá" : "Mở khoá"} className="p-1.5 bg-slate-100 hover:bg-amber-50 text-slate-600 hover:text-amber-600 rounded">
                             <Power className="h-4 w-4" />
                           </button>
-                          <button onClick={() => editUser(u)} title="Sửa" className="p-1.5 bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 rounded">
+                          <button onClick={() => editUser(u)} title="Sửa" className="p-1.5 bg-slate-100 hover:bg-brand-50 text-slate-600 hover:text-brand-700 rounded">
                             <Edit2 className="h-4 w-4" />
                           </button>
                           <button onClick={() => removeUser(u)} title="Xoá" className="p-1.5 bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-600 rounded">
@@ -286,7 +286,7 @@ export default function NguoiDungPage() {
       {linkUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-md rounded-2xl bg-white shadow-xl overflow-hidden">
-            <div className="flex items-center justify-between border-b border-slate-200 bg-emerald-600 px-5 py-3 text-white">
+            <div className="flex items-center justify-between border-b border-slate-200 bg-brand-600 px-5 py-3 text-white">
               <h3 className="font-bold">Link đăng nhập — {linkUser.full_name}</h3>
               <button onClick={() => setLinkUser(null)} className="rounded-md p-1 hover:bg-white/15"><X className="h-5 w-5" /></button>
             </div>

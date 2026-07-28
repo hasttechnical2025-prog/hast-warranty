@@ -37,7 +37,7 @@ export function AdminSettingsTabs() {
                 href={href}
                 className={`flex items-center gap-1.5 whitespace-nowrap border-b-2 px-4 py-3 text-sm font-medium transition-colors ${
                   active
-                    ? "border-emerald-600 text-emerald-700"
+                    ? "border-brand-600 text-brand-700"
                     : "border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300"
                 }`}
               >

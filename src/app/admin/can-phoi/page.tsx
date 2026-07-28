@@ -100,7 +100,7 @@ export default function CanPhoiPage() {
   }
 
   const numCls =
-    "w-20 rounded-md border border-slate-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500";
+    "w-20 rounded-md border border-slate-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500";
 
   return (
     <div className="flex-1 bg-slate-100">
@@ -133,7 +133,7 @@ export default function CanPhoiPage() {
               }}
               className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
                 activeKey === p.profile_key
-                  ? "bg-emerald-600 text-white shadow-sm"
+                  ? "bg-brand-600 text-white shadow-sm"
                   : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
               }`}
             >
@@ -164,7 +164,7 @@ export default function CanPhoiPage() {
               <h3 className="mb-2 text-sm font-bold text-slate-800">Khối đang chọn</h3>
               {selField ? (
                 <>
-                  <div className="mb-3 text-sm font-medium text-emerald-700">{selField.label}</div>
+                  <div className="mb-3 text-sm font-medium text-brand-700">{selField.label}</div>
                   <div className="mb-3 flex items-center gap-3">
                     <label className="flex items-center gap-1 text-xs text-slate-600">
                       X
@@ -233,7 +233,7 @@ export default function CanPhoiPage() {
                     onClick={() => setSelectedField(f.key)}
                     className={`rounded-md px-2 py-1 text-[11px] transition ${
                       selectedField === f.key
-                        ? "bg-emerald-600 text-white"
+                        ? "bg-brand-600 text-white"
                         : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                     }`}
                   >
@@ -295,14 +295,14 @@ export default function CanPhoiPage() {
               <button
                 onClick={save}
                 disabled={saving}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700 disabled:bg-slate-300"
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-600 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-700 disabled:bg-slate-300"
               >
                 <Save className="h-4 w-4" /> {saving ? "Đang lưu..." : `Lưu hồ sơ "${active.ten}"`}
               </button>
               {msg && (
                 <p
                   className={`text-center text-xs ${
-                    msg.startsWith("Lỗi") ? "text-red-600" : "text-emerald-600"
+                    msg.startsWith("Lỗi") ? "text-red-600" : "text-brand-600"
                   }`}
                 >
                   {msg}
@@ -320,7 +320,7 @@ function NudgeBtn({ onClick, children }: { onClick: () => void; children: React.
   return (
     <button
       onClick={onClick}
-      className="flex h-8 w-8 items-center justify-center rounded-md border border-slate-300 bg-white text-slate-600 hover:bg-emerald-50 hover:text-emerald-700"
+      className="flex h-8 w-8 items-center justify-center rounded-md border border-slate-300 bg-white text-slate-600 hover:bg-brand-50 hover:text-brand-700"
     >
       {children}
     </button>

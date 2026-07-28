@@ -105,7 +105,7 @@ export default function CaiDatPage() {
   }
 
   const inputCls =
-    "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500";
+    "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500";
   const labelCls = "mb-1.5 block text-sm font-medium text-slate-700";
 
   if (loading) {
@@ -207,7 +207,7 @@ export default function CaiDatPage() {
                 ))}
                 <button
                   onClick={addBenefit}
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-600 hover:underline"
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 hover:underline"
                 >
                   <Plus className="h-4 w-4" /> Thêm dòng
                 </button>
@@ -229,12 +229,12 @@ export default function CaiDatPage() {
           <button
             onClick={save}
             disabled={saving}
-            className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700 disabled:bg-slate-300"
+            className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-700 disabled:bg-slate-300"
           >
             <Save className="h-4 w-4" /> {saving ? "Đang lưu..." : "Lưu cấu hình"}
           </button>
           {msg && (
-            <span className={`text-sm ${msg.startsWith("Lỗi") ? "text-red-600" : "text-emerald-600"}`}>{msg}</span>
+            <span className={`text-sm ${msg.startsWith("Lỗi") ? "text-red-600" : "text-brand-600"}`}>{msg}</span>
           )}
         </div>
 
@@ -267,7 +267,7 @@ export default function CaiDatPage() {
             </button>
           </div>
           {seqMsg && (
-            <p className={`mt-3 text-sm ${seqMsg.startsWith("Lỗi") ? "text-red-600" : "text-emerald-700"}`}>{seqMsg}</p>
+            <p className={`mt-3 text-sm ${seqMsg.startsWith("Lỗi") ? "text-red-600" : "text-brand-700"}`}>{seqMsg}</p>
           )}
         </div>
       </div>
