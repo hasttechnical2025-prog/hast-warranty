@@ -176,10 +176,7 @@ export function WarrantySheet({
             }}
           >
             {f.key === "qr" ? (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
-                <QRCodeSVG value={qrUrl} size={45} level="M" />
-                <span style={{ fontSize: "7px", color: "#666", fontWeight: "bold" }}>QUÉT TRA CỨU</span>
-              </div>
+              <QRCodeSVG value={qrUrl} size={45} level="M" />
             ) : (
               <FieldText def={f} content={fieldContent(f.key, ticket)} baseFontPt={profile.font_pt} editable={editable} />
             )}
