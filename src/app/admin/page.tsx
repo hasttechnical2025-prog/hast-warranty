@@ -162,7 +162,7 @@ export default function AdminDashboardPage() {
               <tr>
                 <th className="px-6 py-3">Số phiếu</th>
                 <th className="px-6 py-3">Ngày bán</th>
-                <th className="px-6 py-3">Khách hàng</th>
+                <th className="px-6 py-3 min-w-[220px] w-[32%]">Khách hàng</th>
                 <th className="px-6 py-3">Người ĐK</th>
                 <th className="px-6 py-3">Model</th>
                 <th className="px-6 py-3">Serial</th>
@@ -179,7 +179,7 @@ export default function AdminDashboardPage() {
                   <tr key={t.id} className="hover:bg-slate-50 transition">
                     <td className="px-6 py-4 font-semibold text-slate-900">#{t.so_phieu}</td>
                     <td className="px-6 py-4">{formatDate(t.ngay_mua)}</td>
-                    <td className="px-6 py-4 truncate max-w-[200px]" title={t.ten_khach_hang}>{t.ten_khach_hang}</td>
+                    <td className="px-6 py-4 min-w-[220px] whitespace-normal break-words font-medium text-slate-800" title={t.ten_khach_hang}>{t.ten_khach_hang}</td>
                     <td className="px-6 py-4 text-slate-500">{t.nguoi_dang_ky || "-"}</td>
                     <td className="px-6 py-4 font-medium">{t.model_name}</td>
                     <td className="px-6 py-4">{t.serial || "-"}</td>
