@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { DateField } from "@/components/DateField";
 import { X, Save } from "lucide-react";
 
@@ -31,7 +31,10 @@ export function EditTicketModal({ ticketId, onClose, onSaved }: EditTicketModalP
   const [nguoiDangKy, setNguoiDangKy] = useState("");
   const [tenKhachHang, setTenKhachHang] = useState("");
   const [diaChi, setDiaChi] = useState("");
-  const [selectedModel, setSelectedModel] = useState("");
+  const [selectedModel, setSelectedModel] = useState(""); // model_name | "" | "__new__"
+  const [modelQuery, setModelQuery] = useState("");
+  const [showModelDropdown, setShowModelDropdown] = useState(false);
+  const modelBoxRef = useRef<HTMLDivElement>(null);
   const [loaiSanPham, setLoaiSanPham] = useState("");
   const [hangSx, setHangSx] = useState("");
   const [cauHinh, setCauHinh] = useState("");
@@ -56,6 +59,7 @@ export function EditTicketModal({ ticketId, onClose, onSaved }: EditTicketModalP
           setTenKhachHang(t.ten_khach_hang || "");
           setDiaChi(t.dia_chi || "");
           setSelectedModel(t.model_name || "");
+          setModelQuery(t.model_name || "");
           setLoaiSanPham(t.loai_san_pham || "");
           setHangSx(t.hang_sx || "");
           setCauHinh(t.cau_hinh || "");
@@ -78,17 +82,42 @@ export function EditTicketModal({ ticketId, onClose, onSaved }: EditTicketModalP
     };
   }, [ticketId]);
 
-  const handleModelChange = (name: string) => {
-    setSelectedModel(name);
-    const m = models.find((x) => x.model_name === name);
-    if (m) {
-      setLoaiSanPham(m.loai_san_pham);
-      setHangSx(m.hang_sx);
-      setCauHinh(m.cau_hinh);
-      // Chỉ gợi ý lại hạn mức nếu đang trống (tránh ghi đè số đã nhập)
-      setSoBanChup((prev) => (prev ? prev : m.so_ban_chup_mac_dinh > 0 ? String(m.so_ban_chup_mac_dinh) : ""));
-      setSoThang((prev) => (prev ? prev : m.so_thang_mac_dinh > 0 ? String(m.so_thang_mac_dinh) : ""));
+  useEffect(() => {
+    function onDown(e: MouseEvent) {
+      if (modelBoxRef.current && !modelBoxRef.current.contains(e.target as Node)) setShowModelDropdown(false);
     }
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, []);
+
+  const isNewModel = selectedModel === "__new__";
+  const modelQ = modelQuery.trim().toLowerCase();
+  const filteredModels = (
+    modelQ
+      ? models.filter((m) => m.model_name.toLowerCase().includes(modelQ) || (m.hang_sx || "").toLowerCase().includes(modelQ))
+      : models
+  ).slice(0, 8);
+  const exactModelMatch = models.some((m) => m.model_name.toLowerCase() === modelQ);
+
+  const onModelQueryChange = (val: string) => {
+    setModelQuery(val);
+    setShowModelDropdown(true);
+    if (selectedModel && selectedModel !== "__new__" && val !== selectedModel) setSelectedModel("");
+  };
+  const pickModel = (m: Model) => {
+    setSelectedModel(m.model_name);
+    setModelQuery(m.model_name);
+    setLoaiSanPham(m.loai_san_pham);
+    setHangSx(m.hang_sx);
+    setCauHinh(m.cau_hinh);
+    // Chỉ gợi ý lại hạn mức nếu đang trống (tránh ghi đè số đã nhập)
+    setSoBanChup((prev) => (prev ? prev : m.so_ban_chup_mac_dinh > 0 ? String(m.so_ban_chup_mac_dinh) : ""));
+    setSoThang((prev) => (prev ? prev : m.so_thang_mac_dinh > 0 ? String(m.so_thang_mac_dinh) : ""));
+    setShowModelDropdown(false);
+  };
+  const pickNewModel = () => {
+    setSelectedModel("__new__");
+    setShowModelDropdown(false);
   };
 
   const handleSave = async () => {
@@ -96,6 +125,8 @@ export function EditTicketModal({ ticketId, onClose, onSaved }: EditTicketModalP
     if (!tenKhachHang.trim()) return setErrorMsg("Vui lòng điền tên khách hàng.");
     if (!diaChi.trim()) return setErrorMsg("Vui lòng điền địa chỉ.");
     if (!selectedModel) return setErrorMsg("Vui lòng chọn Model.");
+    if (isNewModel && (!modelQuery.trim() || !hangSx.trim()))
+      return setErrorMsg("Model mới: vui lòng nhập Tên model và Hãng SX.");
     if ((Number(soBanChup) || 0) <= 0 && (Number(soThang) || 0) <= 0)
       return setErrorMsg("Cần ít nhất một chế độ bảo hành: theo bản chụp hoặc theo tháng.");
 
@@ -110,7 +141,7 @@ export function EditTicketModal({ ticketId, onClose, onSaved }: EditTicketModalP
           nguoi_dang_ky: nguoiDangKy,
           ten_khach_hang: tenKhachHang,
           dia_chi: diaChi,
-          model_name: selectedModel,
+          model_name: isNewModel ? modelQuery.trim() : selectedModel,
           loai_san_pham: loaiSanPham,
           hang_sx: hangSx,
           cau_hinh: cauHinh,
@@ -180,14 +211,40 @@ export function EditTicketModal({ ticketId, onClose, onSaved }: EditTicketModalP
                   <label className="mb-1 block text-sm font-medium text-slate-700">
                     Model <span className="text-red-500">*</span>
                   </label>
-                  <select value={selectedModel} onChange={(e) => handleModelChange(e.target.value)} className={inputCls}>
-                    <option value="">-- Chọn Model --</option>
-                    {models.map((m) => (
-                      <option key={m.id} value={m.model_name}>
-                        {m.model_name} ({m.hang_sx})
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative" ref={modelBoxRef}>
+                    <input
+                      value={modelQuery}
+                      onChange={(e) => onModelQueryChange(e.target.value)}
+                      onFocus={() => setShowModelDropdown(true)}
+                      placeholder="Gõ tên model để tìm..."
+                      className={inputCls}
+                      autoComplete="off"
+                    />
+                    {showModelDropdown && (
+                      <div className="absolute z-30 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg">
+                        {filteredModels.map((m) => (
+                          <button
+                            key={m.id}
+                            type="button"
+                            onClick={() => pickModel(m)}
+                            className="flex w-full items-center justify-between gap-2 border-b border-slate-50 px-3 py-2 text-left text-sm hover:bg-brand-50"
+                          >
+                            <span className="font-semibold text-slate-800">{m.model_name}</span>
+                            <span className="shrink-0 text-xs text-slate-400">{m.hang_sx}</span>
+                          </button>
+                        ))}
+                        {modelQuery.trim() && !exactModelMatch && (
+                          <button
+                            type="button"
+                            onClick={pickNewModel}
+                            className="block w-full px-3 py-2 text-left text-sm text-amber-700 hover:bg-amber-50"
+                          >
+                            + Thêm model mới: <b>“{modelQuery.trim()}”</b>
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -215,16 +272,34 @@ export function EditTicketModal({ ticketId, onClose, onSaved }: EditTicketModalP
 
               <div className="grid gap-4 sm:grid-cols-3">
                 <div>
-                  <label className="mb-1 block text-xs font-medium text-slate-500">Hãng sản xuất</label>
-                  <input value={hangSx} disabled className={roCls} />
+                  <label className="mb-1 block text-xs font-medium text-slate-500">
+                    Hãng sản xuất {isNewModel && <span className="text-red-500">*</span>}
+                  </label>
+                  <input
+                    value={hangSx}
+                    onChange={(e) => setHangSx(e.target.value)}
+                    disabled={!isNewModel}
+                    placeholder={isNewModel ? "VD: Asmix" : undefined}
+                    className={isNewModel ? inputCls : roCls}
+                  />
                 </div>
                 <div>
                   <label className="mb-1 block text-xs font-medium text-slate-500">Loại sản phẩm</label>
-                  <input value={loaiSanPham} disabled className={roCls} />
+                  <input
+                    value={loaiSanPham}
+                    onChange={(e) => setLoaiSanPham(e.target.value)}
+                    disabled={!isNewModel}
+                    className={isNewModel ? inputCls : roCls}
+                  />
                 </div>
                 <div>
                   <label className="mb-1 block text-xs font-medium text-slate-500">Cấu hình</label>
-                  <input value={cauHinh} disabled className={roCls} />
+                  <input
+                    value={cauHinh}
+                    onChange={(e) => setCauHinh(e.target.value)}
+                    disabled={!isNewModel}
+                    className={isNewModel ? inputCls : roCls}
+                  />
                 </div>
               </div>
 
