@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, Printer, CheckCircle, Clock, Pencil, Hourglass, CheckCheck, XCircle, ClipboardList, AlertTriangle } from "lucide-react";
+import { Search, Printer, CheckCircle, Clock, Pencil, Hourglass, CheckCheck, XCircle, ClipboardList, AlertTriangle, FileSpreadsheet } from "lucide-react";
 import { EditTicketModal } from "@/components/EditTicketModal";
+import { ImportTicketsModal } from "@/components/ImportTicketsModal";
 
 const STAT_CARDS = [
   { key: null as string | null, label: "Tổng phiếu", icon: ClipboardList, tint: "bg-brand-50 text-brand-600", field: "total" as const },
@@ -30,6 +31,7 @@ export default function AdminDashboardPage() {
   const [filter, setFilter] = useState<string>("cho_duyet");
   const [search, setSearch] = useState<string>("");
   const [editId, setEditId] = useState<number | null>(null);
+  const [showImport, setShowImport] = useState(false);
   const [role, setRole] = useState<string>("");
   const [busyId, setBusyId] = useState<number | null>(null);
   const [counts, setCounts] = useState<{ cho_duyet: number; cho_in: number; da_in: number; total: number }>({
@@ -154,6 +156,16 @@ export default function AdminDashboardPage() {
             />
             <button type="submit" className="hidden">Search</button>
           </form>
+
+          {isAdmin && (
+            <button
+              onClick={() => setShowImport(true)}
+              className="ml-3 inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            >
+              <FileSpreadsheet className="h-4 w-4" />
+              Nhập dữ liệu cũ
+            </button>
+          )}
         </div>
 
         <div className="overflow-x-auto flex-1">
@@ -248,6 +260,10 @@ export default function AdminDashboardPage() {
             fetchTickets();
           }}
         />
+      )}
+
+      {showImport && (
+        <ImportTicketsModal onClose={() => setShowImport(false)} onImported={fetchTickets} />
       )}
     </div>
   );
