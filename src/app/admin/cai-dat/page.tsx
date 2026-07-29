@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { DEFAULT_SETTINGS, type AppSettings } from "@/lib/settings";
+import { DEFAULT_SETTINGS, type AppSettings, type BenefitItem } from "@/lib/settings";
 import { AdminSettingsTabs } from "@/components/AdminSettingsTabs";
+import { benefitIcon, BENEFIT_ICON_MAP, BENEFIT_ICON_NAMES } from "@/lib/benefit-icons";
 import { Save, Upload, Trash2, Plus, X, Hash, AlertTriangle } from "lucide-react";
 
 export default function CaiDatPage() {
@@ -10,6 +11,7 @@ export default function CaiDatPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
+  const [iconPickerFor, setIconPickerFor] = useState<number | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const letterheadRef = useRef<HTMLInputElement>(null);
 
@@ -64,21 +66,25 @@ export default function CaiDatPage() {
     reader.readAsDataURL(file);
   }
 
-  function updateBenefit(i: number, val: string) {
-    set("reg_panel_benefits", s.reg_panel_benefits.map((b, idx) => (idx === i ? val : b)));
+  function updateBenefit(i: number, patch: Partial<BenefitItem>) {
+    set("reg_panel_benefits", s.reg_panel_benefits.map((b, idx) => (idx === i ? { ...b, ...patch } : b)));
   }
   function addBenefit() {
-    set("reg_panel_benefits", [...s.reg_panel_benefits, ""]);
+    set("reg_panel_benefits", [...s.reg_panel_benefits, { text: "", icon: "ShieldCheck" }]);
   }
   function removeBenefit(i: number) {
     set("reg_panel_benefits", s.reg_panel_benefits.filter((_, idx) => idx !== i));
+    setIconPickerFor(null);
   }
 
   async function save() {
     setSaving(true);
     setMsg("");
     try {
-      const payload = { ...s, reg_panel_benefits: s.reg_panel_benefits.map((b) => b.trim()).filter(Boolean) };
+      const payload = {
+        ...s,
+        reg_panel_benefits: s.reg_panel_benefits.map((b) => ({ ...b, text: b.text.trim() })).filter((b) => b.text),
+      };
       const res = await fetch("/api/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -243,20 +249,65 @@ export default function CaiDatPage() {
               />
             </div>
             <div>
-              <label className={labelCls}>Các dòng lợi ích</label>
+              <label className={labelCls}>Các dòng lợi ích (bấm ô icon để đổi)</label>
               <div className="space-y-2">
-                {s.reg_panel_benefits.map((b, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <input value={b} onChange={(e) => updateBenefit(i, e.target.value)} className={inputCls} />
-                    <button
-                      onClick={() => removeBenefit(i)}
-                      className="shrink-0 rounded-lg border border-slate-200 p-2 text-slate-400 hover:bg-red-50 hover:text-red-600"
-                      title="Xoá dòng"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                ))}
+                {s.reg_panel_benefits.map((b, i) => {
+                  const Icon = benefitIcon(b.icon);
+                  return (
+                    <div key={i} className="relative flex items-center gap-2">
+                      {/* Nút chọn icon */}
+                      <button
+                        type="button"
+                        onClick={() => setIconPickerFor(iconPickerFor === i ? null : i)}
+                        className="shrink-0 rounded-lg border border-slate-300 bg-slate-50 p-2 text-slate-600 hover:bg-slate-100"
+                        title="Đổi icon"
+                      >
+                        <Icon className="h-5 w-5" />
+                      </button>
+
+                      {/* Bảng chọn icon */}
+                      {iconPickerFor === i && (
+                        <div className="absolute left-0 top-11 z-20 w-64 rounded-xl border border-slate-200 bg-white p-2 shadow-lg">
+                          <div className="grid grid-cols-8 gap-1">
+                            {BENEFIT_ICON_NAMES.map((name) => {
+                              const IcoOpt = BENEFIT_ICON_MAP[name];
+                              const active = b.icon === name;
+                              return (
+                                <button
+                                  key={name}
+                                  type="button"
+                                  onClick={() => {
+                                    updateBenefit(i, { icon: name });
+                                    setIconPickerFor(null);
+                                  }}
+                                  title={name}
+                                  className={`flex items-center justify-center rounded-md p-1.5 transition ${
+                                    active ? "bg-brand-600 text-white" : "text-slate-600 hover:bg-brand-50"
+                                  }`}
+                                >
+                                  <IcoOpt className="h-4 w-4" />
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      <input
+                        value={b.text}
+                        onChange={(e) => updateBenefit(i, { text: e.target.value })}
+                        className={inputCls}
+                      />
+                      <button
+                        onClick={() => removeBenefit(i)}
+                        className="shrink-0 rounded-lg border border-slate-200 p-2 text-slate-400 hover:bg-red-50 hover:text-red-600"
+                        title="Xoá dòng"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  );
+                })}
                 <button
                   onClick={addBenefit}
                   className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 hover:underline"

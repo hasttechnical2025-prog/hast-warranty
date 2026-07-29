@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { DateField } from "@/components/DateField";
 import { DEFAULT_SETTINGS, type AppSettings } from "@/lib/settings";
+import { benefitIcon } from "@/lib/benefit-icons";
 import {
   ShieldCheck,
   User,
@@ -22,9 +23,6 @@ import {
   Info,
   Layers,
 } from "lucide-react";
-
-// Icon cho các dòng lợi ích ở panel trái (lặp lại nếu nhiều hơn số icon).
-const BENEFIT_ICONS = [QrCode, Cloud, Printer];
 
 // Lớp dùng chung cho input để đồng bộ giao diện toàn form.
 const inputBase =
@@ -407,14 +405,14 @@ export default function RegisterWarrantyPage() {
           </div>
 
           <ul className="relative mt-8 space-y-4">
-            {settings.reg_panel_benefits.map((text, i) => {
-              const Icon = BENEFIT_ICONS[i % BENEFIT_ICONS.length];
+            {settings.reg_panel_benefits.map((b, i) => {
+              const Icon = benefitIcon(b.icon);
               return (
                 <li key={i} className="flex items-start gap-3">
                   <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/15 ring-1 ring-white/20">
                     <Icon className="h-4 w-4" />
                   </span>
-                  <span className="text-sm leading-snug text-brand-50/95">{text}</span>
+                  <span className="text-sm leading-snug text-brand-50/95">{b.text}</span>
                 </li>
               );
             })}
