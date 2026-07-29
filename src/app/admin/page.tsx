@@ -184,14 +184,14 @@ export default function AdminDashboardPage() {
                     <td className="px-6 py-4 font-medium">{t.model_name}</td>
                     <td className="px-6 py-4">{t.serial || "-"}</td>
                     <td className="px-6 py-4">
-                      <div className="flex items-center justify-end gap-2">
+                      <div className="flex items-center justify-end gap-1.5">
                         {isAdmin && (
                           <button
                             onClick={() => setEditId(t.id)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-slate-600 rounded text-sm font-medium hover:bg-slate-200 transition"
+                            title="Sửa phiếu"
+                            className="rounded-lg p-2 bg-slate-100 text-slate-600 hover:bg-slate-200 transition"
                           >
                             <Pencil className="h-4 w-4" />
-                            Sửa
                           </button>
                         )}
 
@@ -200,33 +200,33 @@ export default function AdminDashboardPage() {
                             <button
                               onClick={() => changeStatus(t.id, "cho_in")}
                               disabled={busyId === t.id}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded text-sm font-medium hover:bg-emerald-200 transition disabled:opacity-50"
+                              title="Duyệt"
+                              className="rounded-lg p-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition disabled:opacity-50"
                             >
                               <CheckCheck className="h-4 w-4" />
-                              Duyệt
                             </button>
                             <button
                               onClick={() => {
                                 if (window.confirm(`Từ chối phiếu #${t.so_phieu}?`)) changeStatus(t.id, "huy");
                               }}
                               disabled={busyId === t.id}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-600 rounded text-sm font-medium hover:bg-red-100 transition disabled:opacity-50"
+                              title="Từ chối"
+                              className="rounded-lg p-2 bg-red-50 text-red-600 hover:bg-red-100 transition disabled:opacity-50"
                             >
                               <XCircle className="h-4 w-4" />
-                              Từ chối
                             </button>
                           </>
                         ) : (
                           <Link
                             href={`/admin/print/${t.id}`}
-                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-sm font-medium transition ${
+                            title={t.trang_thai === "cho_in" ? "In phôi" : "In lại"}
+                            className={`rounded-lg p-2 transition ${
                               t.trang_thai === "cho_in"
                                 ? "bg-brand-100 text-brand-700 hover:bg-brand-200"
                                 : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                             }`}
                           >
                             <Printer className="h-4 w-4" />
-                            {t.trang_thai === "cho_in" ? "In phôi" : "In lại"}
                           </Link>
                         )}
                       </div>
