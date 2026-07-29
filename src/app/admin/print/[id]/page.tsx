@@ -133,6 +133,16 @@ export default function PrintTicketPage() {
             Căn phôi
           </Link>
 
+          {Number((ticket as any).so_may) > 1 && (
+            <Link
+              href={`/admin/phu-luc/${ticket.id}`}
+              className="flex items-center gap-1.5 px-3 py-2 bg-brand-600 hover:bg-brand-700 rounded text-sm font-semibold transition"
+              title="In danh sách serial đính kèm"
+            >
+              <Printer className="h-4 w-4" /> Phụ lục serial
+            </Link>
+          )}
+
           <button
             onClick={() => setShowBg(!showBg)}
             className="flex items-center gap-1.5 px-3 py-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded text-sm font-medium transition"

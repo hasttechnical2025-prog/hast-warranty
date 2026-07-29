@@ -11,6 +11,7 @@ export default function CaiDatPage() {
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
+  const letterheadRef = useRef<HTMLInputElement>(null);
 
   // Số phiếu
   const [nextSoPhieu, setNextSoPhieu] = useState("");
@@ -44,6 +45,22 @@ export default function CaiDatPage() {
     }
     const reader = new FileReader();
     reader.onload = () => set("logo_data_url", String(reader.result || ""));
+    reader.readAsDataURL(file);
+  }
+
+  function onPickLetterhead(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setMsg("Lỗi: Tệp không phải hình ảnh.");
+      return;
+    }
+    if (file.size > 600 * 1024) {
+      setMsg("Lỗi: Letterhead quá lớn (>600KB). Hãy nén ảnh nhỏ hơn.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => set("letterhead_data_url", String(reader.result || ""));
     reader.readAsDataURL(file);
   }
 
@@ -165,6 +182,41 @@ export default function CaiDatPage() {
                 onChange={(e) => set("system_subtitle", e.target.value)}
                 className={inputCls}
               />
+            </div>
+          </div>
+        </div>
+
+        {/* Letterhead phụ lục serial */}
+        <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="mb-1 text-base font-bold text-slate-800">Letterhead phụ lục serial</h2>
+          <p className="mb-4 text-xs text-slate-500">
+            Ảnh banner ngang in ở đầu trang phụ lục danh sách serial. Chưa có thì dùng header chữ theo tên hệ thống.
+          </p>
+          <div className="flex items-start gap-4">
+            <div className="flex h-20 w-64 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+              {s.letterhead_data_url ? (
+                <img src={s.letterhead_data_url} alt="letterhead" className="h-full w-full object-contain" />
+              ) : (
+                <span className="text-xs text-slate-400">Chưa có</span>
+              )}
+            </div>
+            <div className="flex flex-col gap-2">
+              <input ref={letterheadRef} type="file" accept="image/*" onChange={onPickLetterhead} className="hidden" />
+              <button
+                onClick={() => letterheadRef.current?.click()}
+                className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              >
+                <Upload className="h-4 w-4" /> Chọn letterhead
+              </button>
+              {s.letterhead_data_url && (
+                <button
+                  onClick={() => set("letterhead_data_url", "")}
+                  className="inline-flex items-center gap-2 text-xs font-medium text-red-600 hover:underline"
+                >
+                  <Trash2 className="h-3.5 w-3.5" /> Xoá letterhead
+                </button>
+              )}
+              <span className="text-[11px] text-slate-400">PNG/JPG ngang, tối đa 600KB.</span>
             </div>
           </div>
         </div>

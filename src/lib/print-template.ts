@@ -59,6 +59,7 @@ export interface TicketLike {
   dia_diem_bao_hanh: string;
   so_ban_chup: number;
   so_thang: number;
+  so_may?: number;
   ma_tra_cuu?: string;
 }
 
@@ -145,7 +146,8 @@ export function fieldContent(key: FieldKey, t: TicketLike): string {
     case "model":
       return t.model_name || "";
     case "serial":
-      return t.serial || "";
+      // Phiếu nhiều máy -> serial ghi "theo danh sách đính kèm"
+      return Number(t.so_may) > 1 ? `Theo DS đính kèm (${t.so_may} máy)` : t.serial || "";
     case "cau_hinh":
       return t.cau_hinh || "";
     case "diadiem_tt":

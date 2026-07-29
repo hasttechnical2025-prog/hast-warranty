@@ -3,6 +3,20 @@ import { supabaseAdmin } from '@/lib/supabase';
 import { sendTelegramMessage } from '@/lib/telegram';
 import { requireRole } from '@/lib/session';
 
+// Xoá hẳn 1 phiếu (chỉ admin). Serial đính kèm tự xoá theo (ON DELETE CASCADE).
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  if (!(await requireRole("admin"))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const { id } = await params;
+  const { error } = await supabaseAdmin.from("pbh_phieu_bao_hanh").delete().eq("id", id);
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ success: true });
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

@@ -77,6 +77,7 @@ export async function POST(request: NextRequest) {
       dia_diem_bao_hanh,
       so_ban_chup,
       so_thang,
+      serials, // mảng serial khi phiếu áp cho NHIỀU máy cùng model
       khach_hang_id, // can be passed if selected from lookup
     } = body;
 
@@ -87,8 +88,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Thiếu thông tin bắt buộc (Khách hàng, Địa chỉ, Model)" }, { status: 400 });
     }
 
-    // Clean serial: keep only uppercase alpha-numeric characters (or leave empty)
-    const cleanedSerial = serial ? serial.replace(/[^a-zA-Z0-9]/g, '').toUpperCase() : null;
+    // Danh sách serial (nhiều máy): làm sạch + loại trùng
+    const cleanSerial = (s: any) => String(s || "").replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+    const serialList: string[] = Array.isArray(serials)
+      ? Array.from(new Set(serials.map(cleanSerial).filter(Boolean)))
+      : [];
+    const isMulti = serialList.length > 0;
+    const so_may = isMulti ? serialList.length : 1;
+
+    // Serial đơn (chỉ khi 1 máy). Nhiều máy -> để null, serial nằm ở bảng con.
+    const cleanedSerial = isMulti ? null : serial ? cleanSerial(serial) : null;
 
     let finalCustomerId = khach_hang_id;
     const normalizedName = removeVietnameseTones(ten_khach_hang);
@@ -187,6 +196,7 @@ export async function POST(request: NextRequest) {
       dia_diem_bao_hanh,
       so_ban_chup: Number(so_ban_chup),
       so_thang: Number(so_thang),
+      so_may,
       nguoi_dang_ky: String(nguoi_dang_ky).trim(),
       ma_tra_cuu: lookupCode,
       // Guest đăng ký -> CHỜ DUYỆT; manager/admin tự tạo -> vào thẳng CHỜ IN
@@ -203,20 +213,39 @@ export async function POST(request: NextRequest) {
       .select('id, so_phieu')
       .single();
 
-    // Phòng thủ: nếu chưa chạy migration 003 (cột nguoi_dang_ky chưa có) -> tạo phiếu
-    // không kèm cột đó thay vì để đăng ký thất bại.
-    if (ticketErr && /nguoi_dang_ky/.test(ticketErr.message || "")) {
-      const { nguoi_dang_ky: _omit, ...withoutCol } = ticketData;
+    // Phòng thủ: cột chưa migrate (nguoi_dang_ky mig 003 / so_may mig 007) -> bỏ ĐÚNG
+    // cột lỗi rồi thử lại (từng cột một, tránh mất nhầm cột khác).
+    let attempt: any = ticketData;
+    for (let i = 0; i < 3 && ticketErr; i++) {
+      const m = ticketErr.message || "";
+      if (/so_may/.test(m) && "so_may" in attempt) {
+        const { so_may: _s, ...rest } = attempt;
+        attempt = rest;
+      } else if (/nguoi_dang_ky/.test(m) && "nguoi_dang_ky" in attempt) {
+        const { nguoi_dang_ky: _n, ...rest } = attempt;
+        attempt = rest;
+      } else break;
       ({ data: newTicket, error: ticketErr } = await supabaseAdmin
-        .from('pbh_phieu_bao_hanh')
-        .insert(withoutCol)
-        .select('id, so_phieu')
+        .from("pbh_phieu_bao_hanh")
+        .insert(attempt)
+        .select("id, so_phieu")
         .single());
     }
 
     if (ticketErr || !newTicket) {
       console.error("Error creating ticket:", ticketErr);
       return NextResponse.json({ error: ticketErr?.message || "Không tạo được phiếu" }, { status: 500 });
+    }
+
+    // Ghi danh sách serial (nhiều máy) vào bảng con
+    if (isMulti) {
+      try {
+        await supabaseAdmin
+          .from('pbh_phieu_serial')
+          .insert(serialList.map((s) => ({ phieu_id: newTicket!.id, serial: s })));
+      } catch {
+        /* bảng chưa migrate -> bỏ qua, không hỏng việc tạo phiếu */
+      }
     }
 
     // 4. Send Telegram Notification

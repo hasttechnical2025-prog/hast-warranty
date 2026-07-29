@@ -59,6 +59,8 @@ export default function RegisterWarrantyPage() {
   const [loaiSanPham, setLoaiSanPham] = useState<string>("");
   const [hangSx, setHangSx] = useState<string>("");
   const [serial, setSerial] = useState<string>("");
+  const [loaiPhieu, setLoaiPhieu] = useState<"mot_may" | "nhieu_may">("mot_may");
+  const [serialList, setSerialList] = useState<string>("");
   const [cauHinh, setCauHinh] = useState<string>("");
   const [diaDiemBaoHanh, setDiaDiemBaoHanh] = useState<string>("Tại khách hàng");
   const [soBanChup, setSoBanChup] = useState<string>("");
@@ -227,6 +229,8 @@ export default function RegisterWarrantyPage() {
     setLoaiSanPham("");
     setHangSx("");
     setSerial("");
+    setLoaiPhieu("mot_may");
+    setSerialList("");
     setCauHinh("");
     setDiaDiemBaoHanh("Tại khách hàng");
     setSoBanChup("");
@@ -265,6 +269,10 @@ export default function RegisterWarrantyPage() {
       setErrorMsg("Model mới: vui lòng nhập Tên model và Hãng SX.");
       return;
     }
+    if (isMultiMay && parsedSerials.length === 0) {
+      setErrorMsg("Phiếu nhiều máy: vui lòng dán danh sách serial (mỗi dòng 1 serial).");
+      return;
+    }
     if ((Number(soBanChup) || 0) <= 0 && (Number(soThang) || 0) <= 0) {
       setErrorMsg("Cần ít nhất một chế độ bảo hành: theo bản chụp hoặc theo tháng.");
       return;
@@ -285,7 +293,8 @@ export default function RegisterWarrantyPage() {
           model_name: selectedModel === "__new__" ? modelQuery.trim() : selectedModel,
           loai_san_pham: loaiSanPham,
           hang_sx: hangSx,
-          serial: serial,
+          serial: isMultiMay ? "" : serial,
+          serials: isMultiMay ? parsedSerials : undefined,
           cau_hinh: cauHinh,
           dia_diem_bao_hanh: diaDiemBaoHanh,
           so_ban_chup: soBanChup,
@@ -323,6 +332,11 @@ export default function RegisterWarrantyPage() {
       : models
   ).slice(0, 8);
   const exactModelMatch = models.some((m) => m.model_name.toLowerCase() === modelQ);
+  const isMultiMay = loaiPhieu === "nhieu_may";
+  const rawSerialLines = serialList.split(/\r?\n/).filter((s) => s.trim()).length;
+  const parsedSerials = Array.from(
+    new Set(serialList.split(/\r?\n/).map((s) => s.replace(/[^a-zA-Z0-9]/g, "").toUpperCase()).filter(Boolean))
+  );
 
   // ---- Màn hình thành công ----
   if (successTicket) {
@@ -542,6 +556,30 @@ export default function RegisterWarrantyPage() {
               </div>
 
               <div className="space-y-4 sm:pl-11">
+                {/* Loại phiếu: 1 máy / nhiều máy cùng model */}
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-slate-700">Loại phiếu</label>
+                  <div className="grid grid-cols-2 gap-2 sm:max-w-md">
+                    {[
+                      { v: "mot_may" as const, label: "1 máy (serial đơn)" },
+                      { v: "nhieu_may" as const, label: "Nhiều máy cùng model" },
+                    ].map(({ v, label }) => (
+                      <button
+                        key={v}
+                        type="button"
+                        onClick={() => setLoaiPhieu(v)}
+                        className={`rounded-lg border px-3 py-2 text-sm font-medium transition ${
+                          loaiPhieu === v
+                            ? "border-brand-500 bg-brand-50 text-brand-700"
+                            : "border-slate-200 text-slate-600 hover:border-slate-300"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="grid gap-4 sm:grid-cols-2">
                   {/* Model */}
                   <div>
@@ -588,23 +626,46 @@ export default function RegisterWarrantyPage() {
                     </div>
                   </div>
 
-                  {/* Serial */}
+                  {/* Serial đơn (chỉ khi 1 máy) */}
+                  {!isMultiMay && (
+                    <div>
+                      <label className="mb-1.5 block text-sm font-medium text-slate-700">Số serial</label>
+                      <div className="relative">
+                        <Hash className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                        <input
+                          type="text"
+                          value={serial}
+                          onChange={(e) => handleSerialChange(e.target.value)}
+                          placeholder="Ví dụ: 600186"
+                          className={`${inputBase} pl-10 font-mono tracking-wide`}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Danh sách serial (nhiều máy) */}
+                {isMultiMay && (
                   <div>
                     <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                      Số serial
+                      Danh sách serial <span className="text-red-500">*</span>{" "}
+                      <span className="font-normal text-slate-400">— mỗi dòng 1 serial, dán từ Excel</span>
                     </label>
-                    <div className="relative">
-                      <Hash className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                      <input
-                        type="text"
-                        value={serial}
-                        onChange={(e) => handleSerialChange(e.target.value)}
-                        placeholder="Ví dụ: 600186"
-                        className={`${inputBase} pl-10 font-mono tracking-wide`}
-                      />
-                    </div>
+                    <textarea
+                      value={serialList}
+                      onChange={(e) => setSerialList(e.target.value)}
+                      placeholder={"25000120\n25000121\n25000122\n..."}
+                      className={`${inputBase} h-40 resize-y font-mono text-xs`}
+                    />
+                    <p className="mt-1 text-[11px] text-slate-500">
+                      <b className="text-brand-700">{parsedSerials.length}</b> serial hợp lệ
+                      {rawSerialLines > parsedSerials.length && (
+                        <span className="text-amber-600"> · đã loại {rawSerialLines - parsedSerials.length} dòng trùng/trống</span>
+                      )}
+                      . Phôi sẽ ghi "Theo danh sách đính kèm"; in phụ lục serial riêng để kẹp cùng.
+                    </p>
                   </div>
-                </div>
+                )}
 
                 {/* Model mới: nhắc lưu nháp (tên đã nằm trong ô combobox phía trên) */}
                 {isNewModel && (
@@ -785,6 +846,7 @@ export default function RegisterWarrantyPage() {
                   !diaChi.trim() ||
                   !selectedModel ||
                   (isNewModel && (!modelQuery.trim() || !hangSx.trim())) ||
+                  (isMultiMay && parsedSerials.length === 0) ||
                   ((Number(soBanChup) || 0) <= 0 && (Number(soThang) || 0) <= 0)
                 }
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand-600 to-brand-600 py-3.5 font-bold text-white shadow-sm shadow-brand-500/20 transition hover:from-brand-700 hover:to-brand-700 active:from-brand-800 active:to-brand-800 disabled:from-slate-200 disabled:to-slate-200 disabled:text-slate-400 disabled:shadow-none"
