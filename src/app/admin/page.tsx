@@ -49,7 +49,10 @@ export default function AdminDashboardPage() {
 
   const fetchTickets = () => {
     setLoading(true);
-    fetch(`/api/tickets?status=${filter}&q=${encodeURIComponent(search)}`)
+    const q = search.trim();
+    // Có từ khoá -> tìm trên MỌI trạng thái; không -> lọc theo thẻ đang chọn.
+    const url = q ? `/api/tickets?q=${encodeURIComponent(q)}` : `/api/tickets?status=${filter}`;
+    fetch(url)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) setTickets(data);
@@ -62,14 +65,12 @@ export default function AdminDashboardPage() {
     fetchCounts();
   };
 
+  // Tìm TRỰC TIẾP khi gõ (debounce) — không cần nhấn Enter (dự án chặn Enter submit).
   useEffect(() => {
-    fetchTickets();
-  }, [filter]);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    fetchTickets();
-  };
+    const t = setTimeout(fetchTickets, 250);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter, search]);
 
   const changeStatus = async (id: number, trang_thai: string) => {
     setBusyId(id);
@@ -145,17 +146,25 @@ export default function AdminDashboardPage() {
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex-1 flex flex-col">
         <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-          <form onSubmit={handleSearch} className="relative w-full max-w-sm">
+          <div className="relative w-full max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Tìm số phiếu, tên khách, serial..."
-              className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-md bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full pl-9 pr-8 py-2 border border-slate-300 rounded-md bg-white text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
-            <button type="submit" className="hidden">Search</button>
-          </form>
+            {search && (
+              <button
+                onClick={() => setSearch("")}
+                title="Xoá tìm kiếm"
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+              >
+                <XCircle className="h-4 w-4" />
+              </button>
+            )}
+          </div>
 
           {isAdmin && (
             <button
@@ -185,7 +194,7 @@ export default function AdminDashboardPage() {
               {loading ? (
                 <tr><td colSpan={7} className="px-6 py-12 text-center text-slate-500">Đang tải dữ liệu...</td></tr>
               ) : tickets.length === 0 ? (
-                <tr><td colSpan={7} className="px-6 py-12 text-center text-slate-500">Không có phiếu nào ở mục này.</td></tr>
+                <tr><td colSpan={7} className="px-6 py-12 text-center text-slate-500">{search.trim() ? `Không tìm thấy phiếu khớp "${search.trim()}".` : "Không có phiếu nào ở mục này."}</td></tr>
               ) : (
                 tickets.map((t) => (
                   <tr key={t.id} className="hover:bg-slate-50 transition">

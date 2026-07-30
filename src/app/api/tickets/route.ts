@@ -38,7 +38,9 @@ export async function GET(request: NextRequest) {
       // ilike để tránh chèn thêm điều kiện lọc. Giới hạn độ dài cho an toàn.
       const safe = query.trim().slice(0, 100).replace(/[,()%*\\]/g, '');
       if (safe) {
-        dbQuery = dbQuery.or(`serial.ilike.%${safe}%,ten_khach_hang.ilike.%${safe}%`);
+        const parts = [`serial.ilike.%${safe}%`, `ten_khach_hang.ilike.%${safe}%`];
+        if (/^\d+$/.test(safe)) parts.push(`so_phieu.eq.${safe}`); // tìm theo số phiếu (khớp đúng)
+        dbQuery = dbQuery.or(parts.join(','));
       }
     }
 
