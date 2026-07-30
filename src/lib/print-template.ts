@@ -73,13 +73,13 @@ export const DEFAULT_FIELDS: FieldDef[] = [
   { key: "dia_chi", label: "Địa chỉ", x: 24, y: 48.3, w: 172, align: "left" },
   { key: "loai_sp", label: "Loại sản phẩm", x: 41, y: 60.8, w: 82, align: "left" },
   { key: "hang_sx", label: "Hãng sản xuất", x: 131, y: 60.8, w: 72, align: "left" },
-  { key: "model", label: "Model", x: 22, y: 66.9, w: 95, align: "left", bold: true },
-  { key: "serial", label: "Số serial", x: 125, y: 66.9, w: 78, align: "left", bold: true, mono: true },
+  { key: "model", label: "Model", x: 22, y: 66.9, w: 95, align: "left" },
+  { key: "serial", label: "Số serial", x: 125, y: 66.9, w: 78, align: "left", mono: true },
   { key: "cau_hinh", label: "Cấu hình", x: 48, y: 73.2, w: 140, align: "left" },
-  { key: "diadiem_tt", label: "Tick: Tại trung tâm", x: 28, y: 85.6, align: "left", bold: true },
-  { key: "diadiem_kh", label: "Tick: Tại khách hàng", x: 116, y: 85.6, align: "left", bold: true },
-  { key: "che_do_ban", label: "Số bản chụp", x: 42, y: 91.9, w: 25, align: "center", bold: true },
-  { key: "che_do_thang", label: "Số tháng", x: 106, y: 91.9, w: 12, align: "center", bold: true },
+  { key: "diadiem_tt", label: "Tick: Tại trung tâm", x: 28, y: 85.6, align: "left" },
+  { key: "diadiem_kh", label: "Tick: Tại khách hàng", x: 116, y: 85.6, align: "left" },
+  { key: "che_do_ban", label: "Số bản chụp", x: 42, y: 91.9, w: 25, align: "center" },
+  { key: "che_do_thang", label: "Số tháng", x: 106, y: 91.9, w: 12, align: "center" },
   { key: "qr", label: "Mã QR", x: 10, y: 27, align: "left" },
 ];
 
@@ -101,14 +101,21 @@ export const DEFAULT_PROFILES: TemplateProfile[] = [
   makeDefaultProfile("nua_duoi", "Nửa dưới", "/phoi-duoi.png"),
 ];
 
-// Gộp hồ sơ từ DB với mặc định: đảm bảo mọi field key đều có (tương thích khi
-// bổ sung field mới sau này), giữ toạ độ đã lưu cho các field đã có.
+// Gộp hồ sơ từ DB với mặc định. Chỉ lấy TOẠ ĐỘ đã căn (x, y, fontPt) từ DB;
+// còn KIỂU CHỮ (bold/mono/align/width/label) luôn theo code — nên chỉnh đậm/nhạt
+// trong code là áp dụng ngay, kể cả với hồ sơ căn phôi đã lưu.
 export function mergeProfile(def: TemplateProfile, row: any): TemplateProfile {
   const savedFields: FieldDef[] = Array.isArray(row?.fields) ? row.fields : [];
   const byKey = new Map(savedFields.map((f) => [f.key, f]));
   const fields = DEFAULT_FIELDS.map((d) => {
     const saved = byKey.get(d.key);
-    return saved ? { ...d, ...saved, key: d.key, label: d.label } : { ...d };
+    if (!saved) return { ...d };
+    return {
+      ...d,
+      x: typeof saved.x === "number" ? saved.x : d.x,
+      y: typeof saved.y === "number" ? saved.y : d.y,
+      fontPt: saved.fontPt ?? d.fontPt,
+    };
   });
   return {
     profile_key: def.profile_key,
