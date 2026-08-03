@@ -167,7 +167,7 @@ export function ImportSalesTicketsModal({ onClose, onImported }: Props) {
         {/* Nội dung */}
         <div className="flex-1 space-y-4 overflow-y-auto p-5">
           <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs leading-relaxed text-slate-600">
-            Bôi đen dữ liệu trong Excel/Google Sheets <b>(bao gồm dòng tiêu đề)</b> $\rightarrow$ `Ctrl+C` $\rightarrow$ dán vào khung dưới.
+            Bôi đen dữ liệu trong Excel/Google Sheets <b>(bao gồm dòng tiêu đề)</b> → <code>Ctrl+C</code> → dán vào khung dưới.
             <br />
             Tiêu đề cột được nhận diện: <b>Ngày mua · Tên khách hàng · Địa chỉ · Tỉnh/TP · Model · Serial · Địa điểm · Bản chụp · Tháng</b>.
             <br />
