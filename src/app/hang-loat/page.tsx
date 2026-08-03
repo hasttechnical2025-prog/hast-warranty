@@ -3,7 +3,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { DateField } from "@/components/DateField";
-import { UserCheck, Plus, Trash2, ClipboardPaste, Layers, Printer, CircleCheck, AlertTriangle, ArrowLeft } from "lucide-react";
+import { UserCheck, Plus, Trash2, ClipboardPaste, Layers, Printer, CircleCheck, AlertTriangle, ArrowLeft, FileSpreadsheet } from "lucide-react";
+import { ImportSalesTicketsModal } from "@/components/ImportSalesTicketsModal";
 
 interface Model {
   id: number;
@@ -33,6 +34,8 @@ export default function BulkRegisterPage() {
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [result, setResult] = useState<{ created: { id: number; so_phieu: number }[]; skipped: string[] } | null>(null);
+
+  const [showSalesImport, setShowSalesImport] = useState(false);
 
   useEffect(() => {
     const today = new Date();
@@ -160,14 +163,22 @@ export default function BulkRegisterPage() {
   return (
     <div className="w-full flex-1 px-4 py-8">
       <div className="mx-auto max-w-5xl">
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-xl font-bold text-slate-800">Đăng ký hàng loạt (dự án nhiều máy)</h1>
             <p className="text-sm text-slate-500">Nhập thông tin chung 1 lần, thêm danh sách máy, tạo tất cả trong một lần.</p>
           </div>
-          <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800">
-            <ArrowLeft className="h-4 w-4" /> Đăng ký lẻ
-          </Link>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowSalesImport(true)}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-brand-200 bg-brand-50 px-3.5 py-2 text-sm font-semibold text-brand-700 hover:bg-brand-100 transition"
+            >
+              <FileSpreadsheet className="h-4 w-4" /> Import Excel (Nhiều khách hàng)
+            </button>
+            <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 font-medium">
+              <ArrowLeft className="h-4 w-4" /> Đăng ký lẻ
+            </Link>
+          </div>
         </div>
 
         {errorMsg && (
@@ -331,6 +342,16 @@ export default function BulkRegisterPage() {
         >
           {submitting ? "Đang tạo..." : `Tạo ${validRows.length} phiếu`}
         </button>
+
+        {showSalesImport && (
+          <ImportSalesTicketsModal
+            onClose={() => setShowSalesImport(false)}
+            onImported={() => {
+              // Sau khi import, reload lại form hoặc báo thành công
+              window.location.reload();
+            }}
+          />
+        )}
       </div>
     </div>
   );
