@@ -1,9 +1,9 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
-import { ShieldCheck, ShieldAlert, Calendar, Hash, FileText, CheckCircle2, AlertTriangle, ArrowLeft } from "lucide-react";
+import React from "react";
+import { notFound } from "next/navigation";
+import { ShieldCheck, ShieldAlert, Calendar, Hash, FileText, CheckCircle2, AlertTriangle } from "lucide-react";
 import Link from "next/link";
+import { supabaseAdmin } from "@/lib/supabase";
+import { mergeSettings, DEFAULT_SETTINGS } from "@/lib/settings";
 
 interface PublicTicket {
   so_phieu: number;
@@ -18,42 +18,38 @@ interface PublicTicket {
   cau_hinh: string;
 }
 
-export default function LookupWarrantyPage() {
-  const params = useParams();
-  const code = params?.code as string;
+export default async function LookupWarrantyPage({ params }: { params: Promise<{ code: string }> }) {
+  const { code } = await params;
 
-  const [ticket, setTicket] = useState<PublicTicket | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [errorMsg, setErrorMsg] = useState<string>("");
+  // 1. Kiểm tra cấu hình xem có cho phép tra cứu không
+  let settings = DEFAULT_SETTINGS;
+  try {
+    const { data: settingsData } = await supabaseAdmin
+      .from("pbh_app_settings")
+      .select("data")
+      .eq("id", 1)
+      .single();
 
-  useEffect(() => {
-    if (!code) return;
-    fetch(`/api/lookup/${code}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && !data.error) {
-          setTicket(data);
-        } else {
-          setErrorMsg(data.error || "Không tìm thấy thông tin phiếu.");
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching lookup info:", err);
-        setErrorMsg("Lỗi khi kết nối đến máy chủ.");
-        setLoading(false);
-      });
-  }, [code]);
-
-  if (loading) {
-    return (
-      <div className="flex-1 flex items-center justify-center p-6 bg-slate-50">
-        <div className="text-center text-slate-500 font-medium">Đang kiểm tra thông tin bảo hành...</div>
-      </div>
-    );
+    if (settingsData?.data) {
+      settings = mergeSettings(settingsData.data);
+    }
+  } catch (err) {
+    // Bỏ qua lỗi kết nối DB, dùng mặc định
   }
 
-  if (errorMsg || !ticket) {
+  // Yêu cầu: Nếu tắt chức năng tra cứu -> Trả về lỗi sập trang web thực sự (HTTP 404)
+  if (!settings.enable_lookup) {
+    notFound();
+  }
+
+  // 2. Tra cứu thông tin phiếu trực tiếp trên Server
+  const { data: ticket, error } = await supabaseAdmin
+    .from("pbh_phieu_bao_hanh")
+    .select("so_phieu, ten_khach_hang, model_name, hang_sx, serial, so_ban_chup, so_thang, ngay_mua, dia_diem_bao_hanh, cau_hinh")
+    .eq("ma_tra_cuu", code)
+    .single() as { data: PublicTicket | null, error: any };
+
+  if (error || !ticket) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center p-6 bg-slate-50 gap-4 text-center">
         <div className="bg-red-100 p-4 rounded-full text-red-600">
@@ -70,7 +66,7 @@ export default function LookupWarrantyPage() {
     );
   }
 
-  // Calculate Warranty Expire date
+  // 3. Tính toán ngày tháng và trạng thái hết hạn
   const ngayMuaDate = new Date(ticket.ngay_mua);
   const expDate = new Date(ngayMuaDate);
   expDate.setMonth(expDate.getMonth() + ticket.so_thang);
@@ -82,7 +78,6 @@ export default function LookupWarrantyPage() {
     return `${String(date.getDate()).padStart(2, "0")}/${String(date.getMonth() + 1).padStart(2, "0")}/${date.getFullYear()}`;
   };
 
-  // Mask Customer Name for Privacy
   const maskCustomerName = (name: string) => {
     if (name.length <= 15) return name;
     return name.slice(0, 15) + "...";
