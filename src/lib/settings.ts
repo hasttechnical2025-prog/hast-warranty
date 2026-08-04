@@ -16,6 +16,7 @@ export interface AppSettings {
   reg_panel_benefits: BenefitItem[]; // các dòng lợi ích (có icon riêng)
   reg_panel_footer: string; // dòng chân panel
   letterhead_data_url: string; // ảnh letterhead cho phụ lục serial (rỗng = header chữ)
+  enable_lookup: boolean; // Bật/tắt tính năng quét mã QR tra cứu
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -32,6 +33,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   ],
   reg_panel_footer: "HSTC · Hệ thống Bảo hành",
   letterhead_data_url: "",
+  enable_lookup: true,
 };
 
 // Gộp dữ liệu DB với mặc định (điền thiếu, bỏ giá trị rỗng/không hợp lệ).
@@ -60,5 +62,6 @@ export function mergeSettings(data: any): AppSettings {
     reg_panel_benefits: benefits,
     reg_panel_footer: d.reg_panel_footer || DEFAULT_SETTINGS.reg_panel_footer,
     letterhead_data_url: typeof d.letterhead_data_url === "string" ? d.letterhead_data_url : "",
+    enable_lookup: typeof d.enable_lookup === "boolean" ? d.enable_lookup : DEFAULT_SETTINGS.enable_lookup,
   };
 }

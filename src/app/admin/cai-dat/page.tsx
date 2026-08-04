@@ -327,6 +327,27 @@ export default function CaiDatPage() {
           </div>
         </div>
 
+        {/* Tính năng hệ thống */}
+        <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="mb-4 text-base font-bold text-slate-800">Tính năng hệ thống</h2>
+          <div className="flex items-center gap-2">
+            <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={s.enable_lookup ?? true}
+                onChange={(e) => set("enable_lookup", e.target.checked)}
+                className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+              />
+              <span className="font-semibold text-slate-800">
+                Cho phép khách hàng quét mã QR tự tra cứu thông tin bảo hành
+              </span>
+            </label>
+          </div>
+          <p className="mt-2 text-xs text-slate-500 ml-6">
+            Khi tắt tính năng này, khách hàng quét mã QR trên phiếu bảo hành hoặc truy cập link tra cứu sẽ nhận được thông báo lỗi không tìm thấy (404) để bảo mật thông tin.
+          </p>
+        </div>
+
         {/* Lưu */}
         <div className="mb-8 flex items-center gap-3">
           <button
