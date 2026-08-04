@@ -46,6 +46,11 @@ export function Header() {
       active ? "bg-brand-50 text-brand-700" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
     }`;
 
+  // Ẩn hoàn toàn Header tại trang tra cứu của khách hàng (đặc biệt cần thiết khi trang bị lỗi 404 để khách hàng thấy trắng hoàn toàn)
+  if (pathname?.startsWith("/lookup")) {
+    return null;
+  }
+
   return (
     <header className="no-print px-3 pt-3 sm:px-4 sm:pt-4">
       <div className="mx-auto max-w-7xl rounded-2xl border border-slate-200 bg-white px-4 sm:px-5 shadow-sm">
